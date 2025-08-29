@@ -1,0 +1,39 @@
+@model IEnumerable<ArshatidModels.Models.EF.ArshatidEvent>
+@{
+    ViewData["Title"] = "Viðburðir";
+    string hidePastQuery = Context.Request.Query["hidePast"];
+    bool hidePast = hidePastQuery == "true";
+}
+<h1>Viðburðir</h1>
+<form method="get">
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="hidePast" name="hidePast" value="true" @(hidePast ? "checked" : "") onchange="this.form.submit()" />
+        <label class="form-check-label" for="hidePast">Fela liðna atburði</label>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Ár</th>
+            <th>Yfirlit</th>
+            <th>Skráning hefst</th>
+            <th>Skráningu lýkur</th>
+            <th>Breyta</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (ArshatidModels.Models.EF.ArshatidEvent evt in Model)
+    {
+        <tr>
+            <td>@evt.Year</td>
+            <td>@evt.Heading</td>
+            <td>@evt.RegistrationStartTime</td>
+            <td>@evt.RegistrationEndTime</td>
+            <td>
+                <a asp-action="Upsert" asp-route-id="@evt.Pk" asp-route-hidePast="@(hidePast ? "true" : "false")">Breyta</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<a class="btn btn-primary" asp-action="Upsert" asp-route-hidePast="@(hidePast ? "true" : "false")">Nýr viðburður</a>

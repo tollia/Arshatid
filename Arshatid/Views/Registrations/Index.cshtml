@@ -1,0 +1,28 @@
+@{
+    string eventIdQuery = Context.Request.Query["eventId"];
+    int eventId = int.Parse(eventIdQuery);
+    ViewData["Title"] = "Skráningar";
+    ArshatidModels.Models.EF.ArshatidEvent evnt = (ArshatidModels.Models.EF.ArshatidEvent)ViewBag.Event;
+    Dictionary<DateTime, int> histogram = (Dictionary<DateTime, int>)ViewBag.Histogram;
+    int inviteeCount = (int)ViewBag.InviteeCount;
+    int plusCount = (int)ViewBag.PlusCount;
+}
+<h1>Skráningar</h1>
+<div class="d-flex justify-content-between">
+    <div>Boðsgestir: @inviteeCount | Plús: @plusCount | Samtals skráningar: @(inviteeCount + plusCount)</div>
+    <div>
+        <a class="btn btn-primary me-2" href="/Registrations/export?eventId=@eventId&format=csv">Sækja skráningar CSV</a>
+        <a class="btn btn-secondary" href="/Registrations/export?eventId=@eventId&format=xlsx">Sækja skráningar XLSX</a>
+    </div>
+</div>
+<div class="mt-3">
+@foreach (KeyValuePair<DateTime, int> item in histogram.OrderBy((KeyValuePair<DateTime, int> h) => h.Key))
+{
+    <div class="d-flex align-items-center mb-2">
+        <div style="width:120px">@item.Key.ToString("yyyy-MM-dd")</div>
+        <div class="bg-success" style="height:20px;width:@(item.Value * 20)px"></div>
+        <div class="ms-2">@item.Value</div>
+    </div>
+}
+</div>
+<a class="btn btn-secondary mt-3" asp-controller="Events" asp-action="Upsert" asp-route-id="@eventId">Til baka</a>
