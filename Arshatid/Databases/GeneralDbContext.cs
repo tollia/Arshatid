@@ -1,3 +1,4 @@
+using ArshatidModels.Models.EF;
 using Microsoft.EntityFrameworkCore;
 
 namespace Arshatid.Databases
