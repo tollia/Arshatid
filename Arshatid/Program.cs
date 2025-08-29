@@ -1,5 +1,7 @@
 using Arshatid.Authorization;
 using Arshatid.Databases;
+using Arshatid.Helpers;
+using Arshatid.Services;
 using GraphAuthentication.Authorization.AccessKey;
 using GraphAuthentication.Authorization.Entra;
 using GraphAuthentication.Authorization.Graph;
@@ -31,6 +33,10 @@ builder.Services.AddDbContext<ArshatidDbContext>(options =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
+builder.Services.AddScoped<CurrentEventService>();
+builder.Services.AddScoped<ClaimsHelper>();
+builder.Services.AddScoped<InviteeService>();
+builder.Services.AddScoped<RegistrationService>();
 
 
 // Add services to the container.
