@@ -1,0 +1,52 @@
+@model IEnumerable<ArshatidModels.Models.EF.ArshatidImage>
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Myndir";
+    int eventId = (int)ViewBag.EventId;
+    SelectList imageTypes = (SelectList)ViewBag.ImageTypes;
+}
+<h1>Myndir</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tegund</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (ArshatidModels.Models.EF.ArshatidImage image in Model)
+    {
+        <tr>
+            <td>@image.ImageType.Name</td>
+            <td>
+                <a href="/Events/@eventId/Images/@image.Pk" target="_blank">Skoða</a>
+                |
+                <a href="#" class="delete-image" data-id="@image.Pk">Eyða</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<form method="post" enctype="multipart/form-data" asp-route-eventId="@eventId">
+    <div class="mb-3">
+        <label for="imageTypeFk" class="form-label">Tegund</label>
+        <select class="form-select" name="imageTypeFk" asp-items="imageTypes"></select>
+    </div>
+    <div class="mb-3">
+        <input type="file" name="files" multiple class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Bæta við myndum</button>
+</form>
+<a class="btn btn-secondary mt-3" asp-controller="Events" asp-action="Upsert" asp-route-id="@eventId">Til baka</a>
+@section Scripts {
+<script>
+    document.querySelectorAll('.delete-image').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.dataset.id;
+            fetch(`/Events/@eventId/Images/${id}`, { method: 'DELETE' })
+                .then(() => location.reload());
+        });
+    });
+</script>
+}

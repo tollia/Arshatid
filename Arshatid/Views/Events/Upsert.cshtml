@@ -1,0 +1,62 @@
+@model ArshatidModels.Models.EF.ArshatidEvent
+@{
+    string hidePastQuery = Context.Request.Query["hidePast"];
+    bool hidePast = hidePastQuery == "true";
+    bool isEdit = Model.Pk != 0;
+    ViewData["Title"] = isEdit ? "Breyta viðburði" : "Nýr viðburður";
+}
+<h1>@ViewData["Title"]</h1>
+<form method="post" asp-action="Upsert" asp-route-hidePast="@(hidePast ? "true" : "false")">
+    <input type="hidden" asp-for="Pk" />
+    <div class="mb-3">
+        <label asp-for="Year" class="form-label"></label>
+        <input asp-for="Year" class="form-control" />
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Heading" class="form-label"></label>
+        <input asp-for="Heading" class="form-control" />
+        <span asp-validation-for="Heading" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="SendDescription" class="form-label"></label>
+        <textarea asp-for="SendDescription" class="form-control"></textarea>
+        <span asp-validation-for="SendDescription" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="RegistrationStartTime" class="form-label"></label>
+        <input asp-for="RegistrationStartTime" class="form-control" />
+        <span asp-validation-for="RegistrationStartTime" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="RegistrationEndTime" class="form-label"></label>
+        <input asp-for="RegistrationEndTime" class="form-control" />
+        <span asp-validation-for="RegistrationEndTime" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Vista</button>
+    <button type="submit" class="btn btn-secondary" formaction="?back=true&hidePast=@(hidePast ? "true" : "false")">Til baka</button>
+</form>
+@if (isEdit)
+{
+    <hr />
+    <div class="mb-3">
+        <h3>Myndir</h3>
+        <a class="btn btn-outline-secondary" asp-controller="Images" asp-action="Index" asp-route-eventId="@Model.Pk">Myndir</a>
+    </div>
+    <div class="mb-3">
+        <h3>Boðsgestir</h3>
+        <a class="btn btn-outline-secondary" asp-controller="Invitees" asp-action="Index" asp-route-eventId="@Model.Pk">Boðsgestir</a>
+    </div>
+    <div class="mb-3">
+        <h3>Skráningar</h3>
+        <a class="btn btn-outline-secondary" asp-controller="Registrations" asp-action="Index" asp-route-eventId="@Model.Pk">Skráningar</a>
+    </div>
+}
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
