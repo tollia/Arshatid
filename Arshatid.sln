@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arshatid", "Arshatid\Arshatid.csproj", "{07ADD91C-9784-42F3-8C71-820D1FA113AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArshatidPublic", "ArshatidPublic\ArshatidPublic.csproj", "{1627A7F7-59EE-4BAC-B96F-1CEF27E31C65}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DatabaseScripts", "DatabaseScripts", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Arshatid.sql = Arshatid.sql
+		ArshatidImage.sql = ArshatidImage.sql
+		ArshatidImageType.sql = ArshatidImageType.sql
+		ArshatidInvitee.sql = ArshatidInvitee.sql
+		ArshatidRegistration.sql = ArshatidRegistration.sql
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07ADD91C-9784-42F3-8C71-820D1FA113AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07ADD91C-9784-42F3-8C71-820D1FA113AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07ADD91C-9784-42F3-8C71-820D1FA113AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07ADD91C-9784-42F3-8C71-820D1FA113AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1627A7F7-59EE-4BAC-B96F-1CEF27E31C65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1627A7F7-59EE-4BAC-B96F-1CEF27E31C65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1627A7F7-59EE-4BAC-B96F-1CEF27E31C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1627A7F7-59EE-4BAC-B96F-1CEF27E31C65}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E0F05543-62A1-4299-A280-61B08A43C5BC}
+	EndGlobalSection
+EndGlobal
