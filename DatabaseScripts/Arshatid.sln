@@ -21,8 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DatabaseScripts", "Database
 		ArshatidRegistration.sql = ArshatidRegistration.sql
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArshatidModels", "ArshatidModels\ArshatidModels.csproj", "{83FFE4A6-615B-4A62-8FE4-60841986E9A1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,10 +35,6 @@ Global
 		{1627A7F7-59EE-4BAC-B96F-1CEF27E31C65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1627A7F7-59EE-4BAC-B96F-1CEF27E31C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1627A7F7-59EE-4BAC-B96F-1CEF27E31C65}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83FFE4A6-615B-4A62-8FE4-60841986E9A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83FFE4A6-615B-4A62-8FE4-60841986E9A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83FFE4A6-615B-4A62-8FE4-60841986E9A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83FFE4A6-615B-4A62-8FE4-60841986E9A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
