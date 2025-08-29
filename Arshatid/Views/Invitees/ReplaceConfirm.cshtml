@@ -1,0 +1,8 @@
+@{
+    ViewData["Title"] = "Staðfesta";
+    int count = (int)ViewBag.Count;
+    int eventId = (int)ViewBag.EventId;
+}
+<h1>Staðfesta</h1>
+<p>@count boðsgestir með skráningu yrðu fjarlægðir. Endurtaktu upphleðslu með staðfestingu til að halda áfram.</p>
+<a class="btn btn-secondary" asp-action="Index" asp-route-eventId="@eventId">Til baka</a>
