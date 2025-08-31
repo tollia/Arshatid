@@ -20,51 +20,44 @@ namespace Arshatid.Databases
         {
             base.OnModelCreating(modelBuilder);
 
+            // Table names (keeps EF from guessing)
+            modelBuilder.Entity<ArshatidModels.Models.EF.Arshatid>().ToTable("Arshatid", "dbo");
             modelBuilder.Entity<ArshatidInvitee>().ToTable("ArshatidInvitee", "dbo");
             modelBuilder.Entity<ArshatidRegistration>().ToTable("ArshatidRegistration", "dbo");
-            modelBuilder.Entity<ArshatidModels.Models.EF.Arshatid>().ToTable("Arshatid", "dbo");
             modelBuilder.Entity<ArshatidImage>().ToTable("ArshatidImage", "dbo");
             modelBuilder.Entity<ArshatidImageType>().ToTable("ArshatidImageType", "dbo");
 
-            modelBuilder.Entity<ArshatidRegistration>()
-                .HasOne(r => r.Invitee)
-                .WithMany(i => i.Registrations)   // ensure this nav exists on ArshatidInvitee
-                .HasForeignKey(r => r.ArshatidInviteeFk)
-                .OnDelete(DeleteBehavior.Cascade);
-
+            // ArshatidEvent (principal) 1—* ArshatidInvitee (dependent)
             modelBuilder.Entity<ArshatidInvitee>()
-                .HasOne(i => i.Arshatid)
+                .HasOne(i => i.Event)
                 .WithMany(e => e.Invitees)
                 .HasForeignKey(i => i.ArshatidFk)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ArshatidInvitee>().ToTable(t =>
-            {
-                // Exactly 10 characters
-                t.HasCheckConstraint("ck_ArshatidInvitee_SsnLen", "LEN([Ssn]) = 10");
-
-                // Digits only (no non-digits anywhere)
-                t.HasCheckConstraint("ck_ArshatidInvitee_SsnDigits", "[Ssn] NOT LIKE '%[^0-9]%'");
-            });
-
-            // Invitee uniqueness per event + SSN
-            modelBuilder.Entity<ArshatidInvitee>()
-                .HasIndex(i => new { i.ArshatidFk, i.Ssn })
-                .IsUnique()
-                .HasDatabaseName("unq_ArshatidInvitee_Event_Ssn");
-
-            // Registration uniqueness per invitee
-            modelBuilder.Entity<ArshatidRegistration>()
-                .HasIndex(r => r.ArshatidInviteeFk)
-                .IsUnique()
-                .HasDatabaseName("unq_ArshatidRegistration_Invitee");
-
-            // Relationship clarity
+            // ArshatidInvitee (principal) 1—* ArshatidRegistration (dependent)
             modelBuilder.Entity<ArshatidRegistration>()
                 .HasOne(r => r.Invitee)
                 .WithMany(i => i.Registrations)
                 .HasForeignKey(r => r.ArshatidInviteeFk)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Uniqueness you wanted
+            modelBuilder.Entity<ArshatidInvitee>()
+                .HasIndex(i => new { i.ArshatidFk, i.Ssn })
+                .IsUnique()
+                .HasDatabaseName("unq_ArshatidInvitee_Event_Ssn");
+
+            modelBuilder.Entity<ArshatidRegistration>()
+                .HasIndex(r => r.ArshatidInviteeFk)
+                .IsUnique()
+                .HasDatabaseName("unq_ArshatidRegistration_Invitee");
+
+            // SSN checks (length + digits)
+            modelBuilder.Entity<ArshatidInvitee>().ToTable(t =>
+            {
+                t.HasCheckConstraint("ck_ArshatidInvitee_SsnLen", "LEN([Ssn]) = 10");
+                t.HasCheckConstraint("ck_ArshatidInvitee_SsnDigits", "[Ssn] NOT LIKE '%[^0-9]%'");
+            });
         }
     }
 }

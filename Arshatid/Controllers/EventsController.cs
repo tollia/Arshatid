@@ -30,8 +30,8 @@ public class EventsController : Controller
         {
             query = query.Where((ArshatidModels.Models.EF.Arshatid e) => e.RegistrationEndTime >= nowLocal);
         }
-        List<Arshatid> events = query
-            .OrderByDescending((Arshatid e) => e.EventTime)
+        List<ArshatidModels.Models.EF.Arshatid> events = query
+            .OrderByDescending((ArshatidModels.Models.EF.Arshatid e) => e.EventTime)
             .ToList();
         return View(events);
     }
