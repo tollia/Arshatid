@@ -21,7 +21,7 @@ public class InviteesController : Controller
     [HttpGet]
     public IActionResult Index(int eventId)
     {
-        ArshatidEvent? evnt = _dbContext.ArshatidEvents.FirstOrDefault((ArshatidEvent e) => e.Pk == eventId);
+        ArshatidModels.Models.EF.Arshatid? evnt = _dbContext.ArshatidEvents.FirstOrDefault((ArshatidModels.Models.EF.Arshatid e) => e.Pk == eventId);
         if (evnt == null)
         {
             return NotFound();

@@ -13,7 +13,7 @@ public class CurrentEventService
         _dbContext = dbContext;
     }
 
-    public ArshatidEvent? GetCurrentEvent(DateTime nowLocal)
+    public ArshatidModels.Models.EF.Arshatid? GetCurrentEvent(DateTime nowLocal)
     {
         return _dbContext.ArshatidEvents
             .Where(e => e.RegistrationStartTime <= nowLocal && nowLocal <= e.RegistrationEndTime)

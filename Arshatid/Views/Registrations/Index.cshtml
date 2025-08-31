@@ -2,7 +2,7 @@
     string eventIdQuery = Context.Request.Query["eventId"];
     int eventId = int.Parse(eventIdQuery);
     ViewData["Title"] = "Skráningar";
-    ArshatidModels.Models.EF.ArshatidEvent evnt = (ArshatidModels.Models.EF.ArshatidEvent)ViewBag.Event;
+    ArshatidModels.Models.EF.Arshatid evnt = (ArshatidModels.Models.EF.Arshatid)ViewBag.Event;
     Dictionary<DateTime, int> histogram = (Dictionary<DateTime, int>)ViewBag.Histogram;
     int inviteeCount = (int)ViewBag.InviteeCount;
     int plusCount = (int)ViewBag.PlusCount;

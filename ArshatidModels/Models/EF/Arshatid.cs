@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ArshatidModels.Models.EF;
 
 [Table("Arshatid", Schema = "dbo")]
-public class ArshatidEvent
+public class Arshatid
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

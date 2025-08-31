@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ArshatidModels.Models.EF;
 
-[Table("Invitee", Schema = "dbo")]
+[Table("ArshatidInvitee", Schema = "dbo")]
 public class ArshatidInvitee
 {
     [Key]
@@ -22,7 +22,7 @@ public class ArshatidInvitee
     public int ArshatidFk { get; set; }
 
     [ForeignKey(nameof(ArshatidFk))]
-    public virtual ArshatidEvent Event { get; set; } = null!;
+    public virtual Arshatid Event { get; set; } = null!;
 
     public virtual ICollection<ArshatidRegistration> Registrations { get; set; } = new List<ArshatidRegistration>();
 }
