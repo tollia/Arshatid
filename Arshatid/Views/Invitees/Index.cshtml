@@ -3,7 +3,7 @@
     ArshatidModels.Models.EF.ArshatidEvent evnt = (ArshatidModels.Models.EF.ArshatidEvent)ViewBag.Event;
     int count = (int)ViewBag.Count;
 }
-<h1>@evnt.Heading - @evnt.Year</h1>
+<h1>@evnt.Heading - @evnt.EventTime</h1>
 <p>Fjöldi boðsgesta: @count</p>
 <form method="post" asp-action="Append" asp-route-eventId="@evnt.Pk" enctype="multipart/form-data">
     <div class="mb-3">

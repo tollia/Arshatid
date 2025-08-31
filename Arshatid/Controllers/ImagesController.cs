@@ -1,10 +1,8 @@
 using Arshatid.Databases;
 using ArshatidModels.Models.EF;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 
 namespace Arshatid.Controllers;
 

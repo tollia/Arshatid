@@ -54,7 +54,7 @@ public class IslandIsController : Controller
             return BadRequest();
         }
 
-        ArshatidRegistration? registration = _registrationService.GetByInvitee(currentEvent.Pk, invitee.Pk);
+        ArshatidRegistration? registration = _registrationService.GetByInvitee(invitee);
         if (registration == null)
         {
             return Ok(null);
@@ -82,7 +82,7 @@ public class IslandIsController : Controller
         }
 
         int plus = request.Plus ? 1 : 0;
-        ArshatidRegistration registration = _registrationService.Upsert(currentEvent.Pk, invitee.Pk, plus);
+        ArshatidRegistration registration = _registrationService.Upsert(invitee, plus, request.Alergies);
         RegistrationDto dto = MapToDto(currentEvent, invitee, registration);
         return Ok(dto);
     }
@@ -104,7 +104,7 @@ public class IslandIsController : Controller
             return BadRequest();
         }
 
-        _registrationService.Delete(currentEvent.Pk, invitee.Pk);
+        _registrationService.Delete(invitee);
         return NoContent();
     }
 
@@ -115,7 +115,7 @@ public class IslandIsController : Controller
 
         return new RegistrationDto
         {
-            EventId = currentEvent.Pk,
+            EventId = registration.Invitee.ArshatidFk,
             RegistrationId = registration.Pk,
             Plus = registration.Plus,
             Invitee = new InviteeDto
