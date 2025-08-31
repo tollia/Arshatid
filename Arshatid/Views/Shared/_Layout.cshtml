@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Arshatid</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6/dist/css/tempus-dominus.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Arshatid.styles.css" asp-append-version="true" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -71,108 +72,109 @@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-        (() => {
+        (function () {
           "use strict";
 
+          // ---- Defaults (override globally via window.TD_DEFAULTS, or per-field via data-td-*) ----
           const GLOBAL = window.TD_DEFAULTS || {};
-          const DEFAULTS = {
-            locale: 'is',
-            hourCycle: 'h23',
-            displayFormat: 'dd.MM.yyyy HH:mm',
-            seconds: false,
-            step: 1 // minutes
-          };
-
           const pad = n => String(n).padStart(2, "0");
-          const toLocalIso = d => (
-            `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}` +
-            `T${pad(d.getHours())}:${pad(d.getMinutes())}`
-          );
+          const toLocalIso = d =>
+            `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+          const pickBool = (v, fb) => (v == null ? fb : /^(true|1)$/i.test(String(v)));
 
-          function pickBoolean(attrValue, fallback) {
-            if (attrValue == null) return fallback;
-            const v = String(attrValue).toLowerCase();
-            return v === "true" || v === "1";
-          }
-
-          function findHiddenFor(el) {
-            // 1) explicit selector
-            const sel = el.getAttribute("data-td-target");
-            if (sel) {
-              const node = document.querySelector(sel);
-              if (node) return node;
-            }
-            // 2) next sibling hidden
-            const sib = el.nextElementSibling;
-            if (sib && sib.tagName === "INPUT" && sib.type === "hidden") return sib;
-            // 3) id-based convention: <id>_display => <id>_value
-            if (el.id && el.id.endsWith("_display")) {
-              const guess = document.getElementById(el.id.replace(/_display$/, "_value"));
+          // Find the hidden model-bound input for a visible picker input
+          function findHidden(input) {
+            // Convention: <id>_display -> <id>_value
+            if (input.id && input.id.endsWith("_display")) {
+              const guess = document.getElementById(input.id.replace(/_display$/, "_value"));
               if (guess) return guess;
             }
-            console.warn("TempusDominus: hidden input not found for", el);
+            // Fallback: next hidden sibling
+            const sib = input.nextElementSibling;
+            if (sib && sib.tagName === "INPUT" && sib.type === "hidden") return sib;
+
+            console.warn("TD init: hidden input not found for", input);
             return null;
           }
 
-          function initField(el) {
-            const hidden = findHiddenFor(el);
+          function initField(input) {
+            if (input.dataset.tdInit === "1") return; // idempotent
+            const hidden = findHidden(input);
             if (!hidden) return;
 
-            // Resolve options (priority: field data-attrs > GLOBAL > DEFAULTS)
-            const locale = el.getAttribute("data-td-locale") || GLOBAL.locale || DEFAULTS.locale;
-            const hourCycle = el.getAttribute("data-td-hourcycle") || GLOBAL.hourCycle || DEFAULTS.hourCycle;
-            const displayFormat = el.getAttribute("data-td-display-format") || GLOBAL.displayFormat || DEFAULTS.displayFormat;
-            const seconds = pickBoolean(el.getAttribute("data-td-seconds"), (GLOBAL.seconds ?? DEFAULTS.seconds));
-            const step = parseInt(el.getAttribute("data-td-step") ?? (GLOBAL.step ?? DEFAULTS.step), 10);
+            // Resolve options (per-field -> global -> defaults)
+            const locale  = input.getAttribute("data-td-locale") || GLOBAL.locale || "is";
+            const hour24  = input.getAttribute("data-td-hourcycle") || GLOBAL.hourCycle || "h23";
+            const format  = input.getAttribute("data-td-display-format") || GLOBAL.displayFormat || "dd.MM.yyyy HH:mm";
+            const seconds = pickBool(input.getAttribute("data-td-seconds"), GLOBAL.seconds ?? false);
+            const step    = parseInt(input.getAttribute("data-td-step") ?? (GLOBAL.step ?? 1), 10);
 
-            const picker = new tempusDominus.TempusDominus(el, {
-              localization: { locale, hourCycle, format: displayFormat },
+            // Create instance on the INPUT itself
+            const picker = new tempusDominus.TempusDominus(input, {
+              localization: { locale: locale, hourCycle: hour24, format: format },
               stepping: step,
               display: {
-                components: { calendar: true, hours: true, minutes: true, seconds: seconds }
+                sideBySide: true,                            // date + time columns
+                components: { calendar: true, clock: true, hours: true, minutes: true, seconds: seconds },
+                icons: {                                     // works with Bootstrap Icons
+                  type: "icons",
+                  time: "bi bi-clock", date: "bi bi-calendar3",
+                  up: "bi bi-chevron-up", down: "bi bi-chevron-down",
+                  previous: "bi bi-chevron-left", next: "bi bi-chevron-right",
+                  today: "bi bi-calendar-check", clear: "bi bi-trash", close: "bi bi-x"
+                },
+                buttons: { today: true, clear: true, close: true }
               }
             });
 
             // Seed from hidden ISO if present
             if (hidden.value) {
               const d = new Date(hidden.value);
-              if (!Number.isNaN(d.getTime())) {
-                picker.dates.setValue(d);
-              }
+              if (!Number.isNaN(d.getTime())) picker.dates.setValue(d);
             }
 
-            // Keep hidden ISO updated
-            el.addEventListener("change.td", e => {
+            // Keep hidden ISO updated on change
+            input.addEventListener("change.td", e => {
               const raw = e?.detail?.date;
-              const jsDate = raw && typeof raw.toDate === "function" ? raw.toDate() : raw;
-              if (jsDate instanceof Date && !Number.isNaN(jsDate.getTime())) {
-                hidden.value = toLocalIso(jsDate);
-                // trigger validation/update
+              const js  = raw && typeof raw.toDate === "function" ? raw.toDate() : raw;
+              if (js instanceof Date && !Number.isNaN(js.getTime())) {
+                hidden.value = toLocalIso(js);
+                hidden.dispatchEvent(new Event("input",  { bubbles: true }));
                 hidden.dispatchEvent(new Event("change", { bubbles: true }));
-                hidden.dispatchEvent(new Event("input", { bubbles: true }));
               }
             });
+
+            // Make any toggle that targets this input open the picker
+            if (input.id) {
+              document.querySelectorAll(`[data-td-toggle="datetimepicker"][data-td-target="#${CSS.escape(input.id)}"]`)
+                .forEach(btn => btn.addEventListener("click", (ev) => { ev.preventDefault(); picker.show(); }));
+            }
+
+            // Optional: open on focus
+            input.addEventListener("focus", () => picker.show());
+
+            input.dataset.tdInit = "1";
           }
 
           function initAll() {
             document.querySelectorAll(".td-datetime").forEach(initField);
           }
 
-          // auto-init
           if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", initAll);
           } else {
             initAll();
           }
-          // expose for partials
+
+          // For partials/AJAX
           window.initAllTempusDominus = initAll;
         })();
     </script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
