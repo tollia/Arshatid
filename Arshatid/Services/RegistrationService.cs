@@ -12,36 +12,38 @@ public class RegistrationService
         _dbContext = dbContext;
     }
 
-    public ArshatidRegistration? GetByInvitee(int eventId, int inviteeId)
+    public ArshatidRegistration? GetByInvitee(ArshatidInvitee invitee)
     {
         return _dbContext.ArshatidRegistrations
-            .FirstOrDefault(r => r.ArshatidFk == eventId && r.ArshatidInviteeFk == inviteeId);
+            .FirstOrDefault(r => r.ArshatidInviteeFk == invitee.Pk);
     }
 
-    public ArshatidRegistration Upsert(int eventId, int inviteeId, int plus)
+    public ArshatidRegistration Upsert(
+        ArshatidInvitee invitee, 
+        int plus, 
+        string alergies
+    )
     {
-        ArshatidRegistration? registration = GetByInvitee(eventId, inviteeId);
+        ArshatidRegistration? registration = GetByInvitee(invitee);
         if (registration == null)
         {
-            ArshatidInvitee? invitee = _dbContext.ArshatidInvitees
-                .FirstOrDefault(i => i.Pk == inviteeId);
-            if (invitee == null)
+            if (invitee == null || invitee.Pk == 0)
             {
                 throw new InvalidOperationException("Invitee not found");
             }
 
             registration = new ArshatidRegistration
             {
-                ArshatidFk = eventId,
-                ArshatidInviteeFk = inviteeId,
-                Ssn = invitee.Ssn,
-                Plus = plus
+                ArshatidInviteeFk = invitee.Pk,
+                Plus = plus,
+                Alergies = alergies
             };
             _dbContext.ArshatidRegistrations.Add(registration);
         }
         else
         {
             registration.Plus = plus;
+            registration.Alergies = alergies;
             _dbContext.ArshatidRegistrations.Update(registration);
         }
 
@@ -49,9 +51,9 @@ public class RegistrationService
         return registration;
     }
 
-    public void Delete(int eventId, int inviteeId)
+    public void Delete(ArshatidInvitee invitee)
     {
-        ArshatidRegistration? registration = GetByInvitee(eventId, inviteeId);
+        ArshatidRegistration? registration = GetByInvitee(invitee);
         if (registration != null)
         {
             _dbContext.ArshatidRegistrations.Remove(registration);

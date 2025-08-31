@@ -14,5 +14,5 @@ public class ArshatidImageType
     [StringLength(100)]
     public string Name { get; set; } = string.Empty;
 
-    public virtual ICollection<ArshatidImage> ArshatidImages { get; set; } = new List<ArshatidImage>();
+    public virtual ICollection<ArshatidImage> Images { get; set; } = new List<ArshatidImage>();
 }

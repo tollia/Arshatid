@@ -31,7 +31,7 @@ public class EventsController : Controller
             query = query.Where((ArshatidEvent e) => e.RegistrationEndTime >= nowLocal);
         }
         List<ArshatidEvent> events = query
-            .OrderByDescending((ArshatidEvent e) => e.Year)
+            .OrderByDescending((ArshatidEvent e) => e.EventTime)
             .ToList();
         return View(events);
     }
@@ -58,7 +58,11 @@ public class EventsController : Controller
     }
 
     [HttpPost("Upsert")]
-    public IActionResult Upsert(ArshatidEvent model, [FromQuery] bool back = false, [FromQuery] bool hidePast = false)
+    public IActionResult Upsert(
+        ArshatidEvent model, 
+        [FromQuery] bool back = false, 
+        [FromQuery] bool hidePast = false
+    )
     {
         if (!ModelState.IsValid)
         {
@@ -75,10 +79,6 @@ public class EventsController : Controller
         }
         _dbContext.SaveChanges();
 
-        if (back)
-        {
-            return RedirectToAction("Index", new { hidePast = hidePast });
-        }
-        return RedirectToAction("Upsert", new { id = model.Pk, hidePast = hidePast });
+        return RedirectToAction("Index", new { hidePast = hidePast });
     }
 }

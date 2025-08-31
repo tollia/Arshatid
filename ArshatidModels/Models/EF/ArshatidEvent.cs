@@ -10,7 +10,8 @@ public class ArshatidEvent
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Pk { get; set; }
 
-    public int Year { get; set; }
+    [Required]
+    public DateTime EventTime { get; set; }
 
     [Required]
     [StringLength(255)]
@@ -27,7 +28,7 @@ public class ArshatidEvent
     [Required]
     public DateTime RegistrationEndTime { get; set; }
 
-    public virtual ICollection<ArshatidImage> ArshatidImages { get; set; } = new List<ArshatidImage>();
-    public virtual ICollection<ArshatidInvitee> ArshatidInvitees { get; set; } = new List<ArshatidInvitee>();
-    public virtual ICollection<ArshatidRegistration> ArshatidRegistrations { get; set; } = new List<ArshatidRegistration>();
+    public virtual ICollection<ArshatidImage> Images { get; set; } = new List<ArshatidImage>();
+    public virtual ICollection<ArshatidInvitee> Invitees { get; set; } = new List<ArshatidInvitee>();
+    public virtual ICollection<ArshatidRegistration> Registrations { get; set; } = new List<ArshatidRegistration>();
 }

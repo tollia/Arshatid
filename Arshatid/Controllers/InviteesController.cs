@@ -1,15 +1,12 @@
 using Arshatid.Databases;
 using ArshatidModels.Models.EF;
 using Ganss.Excel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.IO;
 using System.Text;
 
 namespace Arshatid.Controllers;
 
-[Route("Events/{eventId}/Invitees")]
+[Route("Events/{eventId:int}/Invitees")]
 public class InviteesController : Controller
 {
     private readonly ArshatidDbContext _dbContext;
@@ -75,7 +72,7 @@ public class InviteesController : Controller
         {
             List<int> removeIds = toRemove.Select((ArshatidInvitee i) => i.Pk).ToList();
             int conflictCount = _dbContext.ArshatidRegistrations
-                .Count((ArshatidRegistration r) => r.ArshatidFk == eventId && removeIds.Contains(r.ArshatidInviteeFk));
+                .Count((ArshatidRegistration r) => r.Invitee.ArshatidFk == eventId && removeIds.Contains(r.ArshatidInviteeFk));
             if (conflictCount > 0)
             {
                 ViewBag.Count = conflictCount;
@@ -86,7 +83,7 @@ public class InviteesController : Controller
         foreach (ArshatidInvitee invitee in toRemove)
         {
             List<ArshatidRegistration> regs = _dbContext.ArshatidRegistrations
-                .Where((ArshatidRegistration r) => r.ArshatidInviteeFk == invitee.Pk && r.ArshatidFk == eventId)
+                .Where((ArshatidRegistration r) => r.ArshatidInviteeFk == invitee.Pk && r.Invitee.ArshatidFk == eventId)
                 .ToList();
             _dbContext.ArshatidRegistrations.RemoveRange(regs);
         }

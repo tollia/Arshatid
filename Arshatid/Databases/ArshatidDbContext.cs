@@ -20,13 +20,33 @@ namespace Arshatid.Databases
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ArshatidInvitee>()
-                .ToTable(t => t.HasCheckConstraint("ArshatidSsnLen", "len([Ssn])=(10)"));
+            modelBuilder.Entity<ArshatidInvitee>().ToTable(t =>
+            {
+                // Exactly 10 characters
+                t.HasCheckConstraint("ck_ArshatidInvitee_SsnLen", "LEN([Ssn]) = 10");
 
-            modelBuilder.Entity<ArshatidRegistration>()
-                .HasIndex(e => new { e.ArshatidFk, e.Ssn })
+                // Digits only (no non-digits anywhere)
+                t.HasCheckConstraint("ck_ArshatidInvitee_SsnDigits", "[Ssn] NOT LIKE '%[^0-9]%'");
+            });
+
+            // Invitee uniqueness per event + SSN
+            modelBuilder.Entity<ArshatidInvitee>()
+                .HasIndex(i => new { i.ArshatidFk, i.Ssn })
                 .IsUnique()
-                .HasDatabaseName("unq_ArshatidRegistrations");
+                .HasDatabaseName("unq_ArshatidInvitee_Event_Ssn");
+
+            // Registration uniqueness per invitee
+            modelBuilder.Entity<ArshatidRegistration>()
+                .HasIndex(r => r.ArshatidInviteeFk)
+                .IsUnique()
+                .HasDatabaseName("unq_ArshatidRegistration_Invitee");
+
+            // Relationship clarity
+            modelBuilder.Entity<ArshatidRegistration>()
+                .HasOne(r => r.Invitee)
+                .WithMany(i => i.Registrations)
+                .HasForeignKey(r => r.ArshatidInviteeFk)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

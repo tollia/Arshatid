@@ -23,7 +23,7 @@ public class ArshatidImage
     public int ImageTypeFk { get; set; }
 
     [ForeignKey(nameof(ArshatidFk))]
-    public virtual ArshatidEvent ArshatidEvent { get; set; } = null!;
+    public virtual ArshatidEvent Event { get; set; } = null!;
 
     [ForeignKey(nameof(ImageTypeFk))]
     public virtual ArshatidImageType ImageType { get; set; } = null!;

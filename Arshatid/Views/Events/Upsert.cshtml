@@ -6,12 +6,23 @@
     ViewData["Title"] = isEdit ? "Breyta viðburði" : "Nýr viðburður";
 }
 <h1>@ViewData["Title"]</h1>
-<form method="post" asp-action="Upsert" asp-route-hidePast="@(hidePast ? "true" : "false")">
+<form 
+    asp-action="Upsert"
+    asp-route-id="@((int?)null)"
+    asp-route-hidePast="@(hidePast ? "true" : "false")"
+    method="post"
+>
     <input type="hidden" asp-for="Pk" />
     <div class="mb-3">
-        <label asp-for="Year" class="form-label"></label>
-        <input asp-for="Year" class="form-control" />
-        <span asp-validation-for="Year" class="text-danger"></span>
+        <label asp-for="EventTime" class="form-label"></label>
+        <input asp-for="EventTime"
+            type="datetime-local"
+            asp-format="{0:yyyy-MM-ddTHH:mm}"
+            step="60"
+            class="form-control"
+            lang="is"
+        />
+        <span asp-validation-for="EventTime" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Heading" class="form-label"></label>
@@ -39,7 +50,12 @@
         <span asp-validation-for="RegistrationEndTime" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary">Vista</button>
-    <button type="submit" class="btn btn-secondary" formaction="?back=true&hidePast=@(hidePast ? "true" : "false")">Til baka</button>
+    <a class="btn btn-secondary"
+       asp-controller="Events"
+       asp-action="Index"
+       asp-route-hidePast="@(hidePast ? "true" : "false")">
+        Til baka
+    </a>
 </form>
 @if (isEdit)
 {

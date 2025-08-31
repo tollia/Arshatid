@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Arshatid.Controllers;
 
-[Route("[controller]")]
+[Route("Events/{eventId:int}/Registrations")]
 public class RegistrationsController : Controller
 {
     private readonly ArshatidDbContext _dbContext;
@@ -29,7 +29,7 @@ public class RegistrationsController : Controller
             return NotFound();
         }
         List<ArshatidRegistration> registrations = _dbContext.ArshatidRegistrations
-            .Where((ArshatidRegistration r) => r.ArshatidFk == eventId)
+            .Where((ArshatidRegistration r) => r.Invitee.ArshatidFk == eventId)
             .ToList();
         int inviteeCount = registrations.Count;
         int plusCount = registrations.Sum((ArshatidRegistration r) => r.Plus);
@@ -48,19 +48,19 @@ public class RegistrationsController : Controller
     public IActionResult Export(int eventId, string format)
     {
         List<ArshatidRegistration> registrations = _dbContext.ArshatidRegistrations
-            .Where((ArshatidRegistration r) => r.ArshatidFk == eventId)
+            .Where((ArshatidRegistration r) => r.Invitee.ArshatidFk == eventId)
             .ToList();
         List<RegistrationExport> rows = new List<RegistrationExport>();
         foreach (ArshatidRegistration reg in registrations)
         {
             string name = _generalDbContext.Person
-                .FirstOrDefault((Person p) => p.Ssn == reg.Ssn)?.Name ?? reg.Ssn;
+                .FirstOrDefault((Person p) => p.Ssn == reg.Invitee.Ssn)?.Name ?? reg.Invitee.Ssn;
             RegistrationExport row = new RegistrationExport
             {
-                Ssn = reg.Ssn,
+                Ssn = reg.Invitee.Ssn,
                 Name = name,
                 Plus = reg.Plus,
-                EventId = reg.ArshatidFk
+                EventId = reg.Invitee.ArshatidFk
             };
             rows.Add(row);
         }

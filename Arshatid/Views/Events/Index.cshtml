@@ -14,23 +14,25 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Ár</th>
+            <th>Tímasetning</th>
             <th>Yfirlit</th>
             <th>Skráning hefst</th>
             <th>Skráningu lýkur</th>
-            <th>Breyta</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
     @foreach (ArshatidModels.Models.EF.ArshatidEvent evt in Model)
     {
         <tr>
-            <td>@evt.Year</td>
+            <td>@evt.EventTime</td>
             <td>@evt.Heading</td>
             <td>@evt.RegistrationStartTime</td>
             <td>@evt.RegistrationEndTime</td>
             <td>
-                <a asp-action="Upsert" asp-route-id="@evt.Pk" asp-route-hidePast="@(hidePast ? "true" : "false")">Breyta</a>
+                    <a asp-action="Upsert" asp-route-id="@evt.Pk" asp-route-hidePast="@(hidePast ? "true" : "false")">Breyta</a>
+                    <a asp-action="Index" asp-controller="Registrations" asp-route-eventid="@evt.Pk">Skráningar</a>
+                    <a asp-action="Index" asp-controller="Invitees" asp-route-eventid="@evt.Pk">Boðslisti</a>
             </td>
         </tr>
     }
