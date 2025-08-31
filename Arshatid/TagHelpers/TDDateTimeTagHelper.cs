@@ -40,6 +40,7 @@ namespace Arshatid.TagHelpers
 
             // wrap in a div and merge any classes supplied on <td-datetime class="...">
             output.TagName = "div";
+            output.TagMode = TagMode.StartTagAndEndTag;
             output.Attributes.SetAttribute("class", CombineWrapperClasses("mb-3", ContainerClass, output));
 
             // <label for="..." class="form-label ...">Label</label>
