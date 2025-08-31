@@ -58,8 +58,6 @@ namespace Arshatid.TagHelpers
             TagBuilder group = new TagBuilder("div");
             group.Attributes["id"] = groupId;
             group.AddCssClass(CombineClasses("input-group", GroupClass));
-            group.Attributes["data-td-target-input"] = "nearest";
-            group.Attributes["data-td-target-toggle"] = "nearest";
 
             // Visible input (no name; TD binds to it)
             TagBuilder visible = new TagBuilder("input");
@@ -67,8 +65,6 @@ namespace Arshatid.TagHelpers
             visible.Attributes["id"] = displayId;
             visible.Attributes["data-td-target"] = "#" + displayId;
             visible.AddCssClass(CombineClasses("form-control td-datetime", InputClass));
-            // point TD at the group so both input & toggle work
-            visible.Attributes["data-td-target"] = "#" + groupId;
 
             // Optional per-field overrides (read by your initializer)
             if (!string.IsNullOrEmpty(Locale)) visible.Attributes["data-td-locale"] = Locale;

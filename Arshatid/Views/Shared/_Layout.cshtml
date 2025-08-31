@@ -80,24 +80,30 @@
         (function () {
           "use strict";
 
-          // ---- Defaults (override globally via window.TD_DEFAULTS, or per-field via data-td-*) ----
           const GLOBAL = window.TD_DEFAULTS || {};
           const pad = n => String(n).padStart(2, "0");
           const toLocalIso = d =>
             `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
           const pickBool = (v, fb) => (v == null ? fb : /^(true|1)$/i.test(String(v)));
 
-          // Find the hidden model-bound input for a visible picker input
+          function formatDisplay(d, fmt) {
+              return fmt
+                .replace(/yyyy/g, String(d.getFullYear()))
+                .replace(/MM/g,   pad(d.getMonth()+1))
+                .replace(/dd/g,   pad(d.getDate()))
+                .replace(/HH/g,   pad(d.getHours()))
+                .replace(/mm/g,   pad(d.getMinutes()))
+                .replace(/ss/g,   pad(d.getSeconds()));
+            }
           function findHidden(input) {
-            // Convention: <id>_display -> <id>_value
+            // convention: <id>_display -> <id>_value
             if (input.id && input.id.endsWith("_display")) {
               const guess = document.getElementById(input.id.replace(/_display$/, "_value"));
               if (guess) return guess;
             }
-            // Fallback: next hidden sibling
+            // fallback: next hidden sibling
             const sib = input.nextElementSibling;
             if (sib && sib.tagName === "INPUT" && sib.type === "hidden") return sib;
-
             console.warn("TD init: hidden input not found for", input);
             return null;
           }
@@ -107,38 +113,35 @@
             const hidden = findHidden(input);
             if (!hidden) return;
 
-            // Resolve options (per-field -> global -> defaults)
             const locale  = input.getAttribute("data-td-locale") || GLOBAL.locale || "is";
             const hour24  = input.getAttribute("data-td-hourcycle") || GLOBAL.hourCycle || "h23";
             const format  = input.getAttribute("data-td-display-format") || GLOBAL.displayFormat || "dd.MM.yyyy HH:mm";
             const seconds = pickBool(input.getAttribute("data-td-seconds"), GLOBAL.seconds ?? false);
             const step    = parseInt(input.getAttribute("data-td-step") ?? (GLOBAL.step ?? 1), 10);
 
-            // Create instance on the INPUT itself
+            // 1) Create picker on the VISIBLE input
             const picker = new tempusDominus.TempusDominus(input, {
               localization: { locale: locale, hourCycle: hour24, format: format },
               stepping: step,
               display: {
-                sideBySide: true,                            // date + time columns
-                components: { calendar: true, clock: true, hours: true, minutes: true, seconds: seconds },
-                icons: {                                     // works with Bootstrap Icons
-                  type: "icons",
-                  time: "bi bi-clock", date: "bi bi-calendar3",
-                  up: "bi bi-chevron-up", down: "bi bi-chevron-down",
-                  previous: "bi bi-chevron-left", next: "bi bi-chevron-right",
-                  today: "bi bi-calendar-check", clear: "bi bi-trash", close: "bi bi-x"
-                },
-                buttons: { today: true, clear: true, close: true }
+                sideBySide: true,
+                components: { calendar: true, clock: true, hours: true, minutes: true, seconds: seconds }
               }
             });
+            // keep a handle for debugging if needed
+            input._td = picker;
 
-            // Seed from hidden ISO if present
+            // 2) Seed from hidden ISO
             if (hidden.value) {
-              const d = new Date(hidden.value);
-              if (!Number.isNaN(d.getTime())) picker.dates.setValue(d);
+              const d = new Date(hidden.value);            // local time from ISO without zone
+              if (!Number.isNaN(d.getTime())) {
+                picker.dates.setValue(d);                  // set TD internal value
+                // Force the input to show the formatted text immediately
+                input.value = formatDisplay(d, format);
+              }
             }
 
-            // Keep hidden ISO updated on change
+            // 3) Sync hidden ISO on change
             input.addEventListener("change.td", e => {
               const raw = e?.detail?.date;
               const js  = raw && typeof raw.toDate === "function" ? raw.toDate() : raw;
@@ -149,13 +152,32 @@
               }
             });
 
-            // Make any toggle that targets this input open the picker
+            // 4) Make the icon/button open the picker
             if (input.id) {
-              document.querySelectorAll(`[data-td-toggle="datetimepicker"][data-td-target="#${CSS.escape(input.id)}"]`)
-                .forEach(btn => btn.addEventListener("click", (ev) => { ev.preventDefault(); picker.show(); }));
+              const expected = "#" + input.id;
+
+              // direct buttons with matching target
+              document.querySelectorAll('[data-td-toggle="datetimepicker"]').forEach(btn => {
+                if (btn.getAttribute("data-td-target") === expected) {
+                  btn.addEventListener("click", ev => { ev.preventDefault(); input.focus(); picker.toggle(); });
+                }
+              });
+
+              // also handle clicks inside the same input-group
+              const group = input.closest(".input-group");
+              if (group) {
+                group.addEventListener("click", ev => {
+                  const t = ev.target.closest('[data-td-toggle="datetimepicker"]');
+                  if (t && t.getAttribute("data-td-target") === expected) {
+                    ev.preventDefault();
+                    input.focus();
+                    picker.toggle();
+                  }
+                });
+              }
             }
 
-            // Optional: open on focus
+            // 5) Open on focus (nice UX)
             input.addEventListener("focus", () => picker.show());
 
             input.dataset.tdInit = "1";
@@ -170,8 +192,6 @@
           } else {
             initAll();
           }
-
-          // For partials/AJAX
           window.initAllTempusDominus = initAll;
         })();
     </script>
