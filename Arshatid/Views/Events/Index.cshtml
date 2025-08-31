@@ -1,4 +1,4 @@
-@model IEnumerable<ArshatidModels.Models.EF.ArshatidEvent>
+@model IEnumerable<ArshatidModels.Models.EF.Arshatid>
 @{
     ViewData["Title"] = "Viðburðir";
     string hidePastQuery = Context.Request.Query["hidePast"];
@@ -22,7 +22,7 @@
         </tr>
     </thead>
     <tbody>
-    @foreach (ArshatidModels.Models.EF.ArshatidEvent evt in Model)
+    @foreach (ArshatidModels.Models.EF.Arshatid evt in Model)
     {
         <tr>
             <td>@evt.EventTime</td>

@@ -41,7 +41,7 @@ public class IslandIsController : Controller
     public ActionResult<RegistrationDto?> GetRegistration()
     {
         DateTime nowLocal = GetNowLocal();
-        ArshatidEvent? currentEvent = _currentEventService.GetCurrentEvent(nowLocal);
+        ArshatidModels.Models.EF.Arshatid? currentEvent = _currentEventService.GetCurrentEvent(nowLocal);
         if (currentEvent == null)
         {
             return Ok(null);
@@ -68,7 +68,7 @@ public class IslandIsController : Controller
     public ActionResult<RegistrationDto> UpsertRegistration([FromBody] UpsertRegistrationRequest request)
     {
         DateTime nowLocal = GetNowLocal();
-        ArshatidEvent? currentEvent = _currentEventService.GetCurrentEvent(nowLocal);
+        ArshatidModels.Models.EF.Arshatid? currentEvent = _currentEventService.GetCurrentEvent(nowLocal);
         if (currentEvent == null)
         {
             return BadRequest();
@@ -91,7 +91,7 @@ public class IslandIsController : Controller
     public IActionResult DeleteRegistration()
     {
         DateTime nowLocal = GetNowLocal();
-        ArshatidEvent? currentEvent = _currentEventService.GetCurrentEvent(nowLocal);
+        ArshatidModels.Models.EF.Arshatid? currentEvent = _currentEventService.GetCurrentEvent(nowLocal);
         if (currentEvent == null)
         {
             return BadRequest();
@@ -108,7 +108,7 @@ public class IslandIsController : Controller
         return NoContent();
     }
 
-    private RegistrationDto MapToDto(ArshatidEvent currentEvent, ArshatidInvitee invitee, ArshatidRegistration registration)
+    private RegistrationDto MapToDto(ArshatidModels.Models.EF.Arshatid currentEvent, ArshatidInvitee invitee, ArshatidRegistration registration)
     {
         string name = _generalDbContext.Person
             .FirstOrDefault(p => p.Ssn == invitee.Ssn)?.Name ?? invitee.Ssn;

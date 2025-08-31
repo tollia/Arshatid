@@ -10,7 +10,7 @@ namespace Arshatid.Databases
         {
         }
 
-        public DbSet<ArshatidEvent> ArshatidEvents { get; set; }
+        public DbSet<ArshatidModels.Models.EF.Arshatid> ArshatidEvents { get; set; }
         public DbSet<ArshatidImage> ArshatidImages { get; set; }
         public DbSet<ArshatidImageType> ArshatidImageTypes { get; set; }
         public DbSet<ArshatidInvitee> ArshatidInvitees { get; set; }
@@ -19,6 +19,24 @@ namespace Arshatid.Databases
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ArshatidInvitee>().ToTable("ArshatidInvitee", "dbo");
+            modelBuilder.Entity<ArshatidRegistration>().ToTable("ArshatidRegistration", "dbo");
+            modelBuilder.Entity<ArshatidModels.Models.EF.Arshatid>().ToTable("Arshatid", "dbo");
+            modelBuilder.Entity<ArshatidImage>().ToTable("ArshatidImage", "dbo");
+            modelBuilder.Entity<ArshatidImageType>().ToTable("ArshatidImageType", "dbo");
+
+            modelBuilder.Entity<ArshatidRegistration>()
+                .HasOne(r => r.Invitee)
+                .WithMany(i => i.Registrations)   // ensure this nav exists on ArshatidInvitee
+                .HasForeignKey(r => r.ArshatidInviteeFk)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ArshatidInvitee>()
+                .HasOne(i => i.Arshatid)
+                .WithMany(e => e.Invitees)
+                .HasForeignKey(i => i.ArshatidFk)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ArshatidInvitee>().ToTable(t =>
             {

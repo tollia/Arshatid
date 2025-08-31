@@ -25,13 +25,13 @@ public class EventsController : Controller
     public IActionResult Index([FromQuery] bool hidePast = false)
     {
         DateTime nowLocal = GetNowLocal();
-        IQueryable<ArshatidEvent> query = _dbContext.ArshatidEvents;
+        IQueryable<ArshatidModels.Models.EF.Arshatid> query = _dbContext.ArshatidEvents;
         if (hidePast)
         {
-            query = query.Where((ArshatidEvent e) => e.RegistrationEndTime >= nowLocal);
+            query = query.Where((ArshatidModels.Models.EF.Arshatid e) => e.RegistrationEndTime >= nowLocal);
         }
-        List<ArshatidEvent> events = query
-            .OrderByDescending((ArshatidEvent e) => e.EventTime)
+        List<Arshatid> events = query
+            .OrderByDescending((Arshatid e) => e.EventTime)
             .ToList();
         return View(events);
     }
@@ -39,11 +39,11 @@ public class EventsController : Controller
     [HttpGet("Upsert/{id?}")]
     public IActionResult Upsert(int? id)
     {
-        ArshatidEvent model;
+        ArshatidModels.Models.EF.Arshatid model;
         if (id.HasValue)
         {
-            ArshatidEvent? existing = _dbContext.ArshatidEvents
-                .FirstOrDefault((ArshatidEvent e) => e.Pk == id.Value);
+            ArshatidModels.Models.EF.Arshatid? existing = _dbContext.ArshatidEvents
+                .FirstOrDefault((ArshatidModels.Models.EF.Arshatid e) => e.Pk == id.Value);
             if (existing == null)
             {
                 return NotFound();
@@ -52,14 +52,14 @@ public class EventsController : Controller
         }
         else
         {
-            model = new ArshatidEvent();
+            model = new ArshatidModels.Models.EF.Arshatid();
         }
         return View(model);
     }
 
     [HttpPost("Upsert")]
     public IActionResult Upsert(
-        ArshatidEvent model, 
+        ArshatidModels.Models.EF.Arshatid model, 
         [FromQuery] bool back = false, 
         [FromQuery] bool hidePast = false
     )

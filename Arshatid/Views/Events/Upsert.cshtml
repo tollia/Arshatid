@@ -1,4 +1,4 @@
-@model ArshatidModels.Models.EF.ArshatidEvent
+@model ArshatidModels.Models.EF.Arshatid
 @{
     string hidePastQuery = Context.Request.Query["hidePast"];
     bool hidePast = hidePastQuery == "true";
@@ -17,8 +17,7 @@
         <label asp-for="EventTime" class="form-label"></label>
         <input asp-for="EventTime"
             type="datetime-local"
-            asp-format="{0:yyyy-MM-ddTHH:mm}"
-            step="60"
+            asp-format="{0:yyyy-MM-ddTHH24:mm}"
             class="form-control"
             lang="is"
         />
@@ -41,12 +40,22 @@
     </div>
     <div class="mb-3">
         <label asp-for="RegistrationStartTime" class="form-label"></label>
-        <input asp-for="RegistrationStartTime" class="form-control" />
+        <input asp-for="RegistrationStartTime"
+               type="datetime-local"
+               asp-format="{0:yyyy-MM-ddTHH:mm}"
+               class="form-control"
+               lang="is"
+        />
         <span asp-validation-for="RegistrationStartTime" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="RegistrationEndTime" class="form-label"></label>
-        <input asp-for="RegistrationEndTime" class="form-control" />
+        <input asp-for="RegistrationEndTime"
+               type="datetime-local"
+               asp-format="{0:yyyy-MM-ddTHH:mm}"
+               class="form-control"
+               lang="is"
+        />
         <span asp-validation-for="RegistrationEndTime" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary">Vista</button>
