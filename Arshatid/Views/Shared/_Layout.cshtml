@@ -1,10 +1,13 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="is">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Arshatid</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6/dist/css/tempus-dominus.min.css" />
+
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Arshatid.styles.css" asp-append-version="true" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -71,7 +74,109 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6/dist/js/tempus-dominus.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        (() => {
+          "use strict";
+
+          const GLOBAL = window.TD_DEFAULTS || {};
+          const DEFAULTS = {
+            locale: 'is',
+            hourCycle: 'h23',
+            displayFormat: 'dd.MM.yyyy HH:mm',
+            seconds: false,
+            step: 1 // minutes
+          };
+
+          const pad = n => String(n).padStart(2, "0");
+          const toLocalIso = d => (
+            `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}` +
+            `T${pad(d.getHours())}:${pad(d.getMinutes())}`
+          );
+
+          function pickBoolean(attrValue, fallback) {
+            if (attrValue == null) return fallback;
+            const v = String(attrValue).toLowerCase();
+            return v === "true" || v === "1";
+          }
+
+          function findHiddenFor(el) {
+            // 1) explicit selector
+            const sel = el.getAttribute("data-td-target");
+            if (sel) {
+              const node = document.querySelector(sel);
+              if (node) return node;
+            }
+            // 2) next sibling hidden
+            const sib = el.nextElementSibling;
+            if (sib && sib.tagName === "INPUT" && sib.type === "hidden") return sib;
+            // 3) id-based convention: <id>_display => <id>_value
+            if (el.id && el.id.endsWith("_display")) {
+              const guess = document.getElementById(el.id.replace(/_display$/, "_value"));
+              if (guess) return guess;
+            }
+            console.warn("TempusDominus: hidden input not found for", el);
+            return null;
+          }
+
+          function initField(el) {
+            const hidden = findHiddenFor(el);
+            if (!hidden) return;
+
+            // Resolve options (priority: field data-attrs > GLOBAL > DEFAULTS)
+            const locale = el.getAttribute("data-td-locale") || GLOBAL.locale || DEFAULTS.locale;
+            const hourCycle = el.getAttribute("data-td-hourcycle") || GLOBAL.hourCycle || DEFAULTS.hourCycle;
+            const displayFormat = el.getAttribute("data-td-display-format") || GLOBAL.displayFormat || DEFAULTS.displayFormat;
+            const seconds = pickBoolean(el.getAttribute("data-td-seconds"), (GLOBAL.seconds ?? DEFAULTS.seconds));
+            const step = parseInt(el.getAttribute("data-td-step") ?? (GLOBAL.step ?? DEFAULTS.step), 10);
+
+            const picker = new tempusDominus.TempusDominus(el, {
+              localization: { locale, hourCycle, format: displayFormat },
+              stepping: step,
+              display: {
+                components: { calendar: true, hours: true, minutes: true, seconds: seconds }
+              }
+            });
+
+            // Seed from hidden ISO if present
+            if (hidden.value) {
+              const d = new Date(hidden.value);
+              if (!Number.isNaN(d.getTime())) {
+                picker.dates.setValue(d);
+              }
+            }
+
+            // Keep hidden ISO updated
+            el.addEventListener("change.td", e => {
+              const raw = e?.detail?.date;
+              const jsDate = raw && typeof raw.toDate === "function" ? raw.toDate() : raw;
+              if (jsDate instanceof Date && !Number.isNaN(jsDate.getTime())) {
+                hidden.value = toLocalIso(jsDate);
+                // trigger validation/update
+                hidden.dispatchEvent(new Event("change", { bubbles: true }));
+                hidden.dispatchEvent(new Event("input", { bubbles: true }));
+              }
+            });
+          }
+
+          function initAll() {
+            document.querySelectorAll(".td-datetime").forEach(initField);
+          }
+
+          // auto-init
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initAll);
+          } else {
+            initAll();
+          }
+          // expose for partials
+          window.initAllTempusDominus = initAll;
+        })();
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

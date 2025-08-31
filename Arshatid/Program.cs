@@ -7,6 +7,7 @@ using GraphAuthentication.Authorization.Entra;
 using GraphAuthentication.Authorization.Graph;
 using GraphAuthentication.Authorization.IslandIs;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using QuestPDF.Infrastructure;
 using System.Diagnostics;
@@ -66,8 +67,12 @@ builder.Services.AddScoped<RegistrationService>();
 
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
-
+builder.Services
+    .AddControllersWithViews()
+    .AddViewOptions(options =>
+    {
+        options.HtmlHelperOptions.Html5DateRenderingMode = Html5DateRenderingMode.Rfc3339;
+    });
 
 builder.Services.AddGraphGroupAuthentication(builder.Configuration)
     .AddIslandJwtAuthentication(builder.Configuration)

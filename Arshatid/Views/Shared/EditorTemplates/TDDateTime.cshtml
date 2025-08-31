@@ -1,0 +1,27 @@
+﻿@model DateTime?
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    string fullName = Html.NameForModel();   // "EventTime" or "Events[0].EventTime"
+    string baseId   = Html.IdForModel();     // safe id, e.g., "Events_0__EventTime"
+    string displayId = baseId + "_display";
+    string hiddenId  = baseId + "_value";
+    string labelText = ViewData.ModelMetadata.GetDisplayName() ?? fullName;
+}
+
+<div class="mb-3">
+    <label for="@displayId" class="form-label">@labelText</label>
+
+    <input id="@displayId"
+           type="text"
+           class="form-control td-datetime" />
+
+    <input type="hidden"
+           id="@hiddenId"
+           name="@fullName"
+           value="@(Model.HasValue? Model.Value.ToString("yyyy-MM-ddTHH\\:mm") : string.Empty)" />
+
+    <span class="text-danger field-validation-valid"
+          data-valmsg-for="@fullName"
+          data-valmsg-replace="true"></span>
+</div>
