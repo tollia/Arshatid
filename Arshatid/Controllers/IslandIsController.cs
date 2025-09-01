@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Arshatid.Controllers;
 
+[ApiController]
 [Route("islandapi")]
 [Authorize(AuthenticationSchemes = "IslandIs")]
 public class IslandIsController : Controller
