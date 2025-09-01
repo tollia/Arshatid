@@ -1,8 +1,31 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-<p><img width="700px" src="img/CoverPhoto.jpg"></img></p>
+@model ArshatidPublic.Models.RegistrationViewModel
+
+<p><img width="700px" src="img/CoverPhoto.jpg" /></p>
 <h1>Skráning</h1>
 
+@if (ViewBag.NotInvitedMessage != null)
+{
+    <div class="alert alert-warning">@ViewBag.NotInvitedMessage</div>
+}
+else
+{
+    <div class="container mt-3">
+        <form asp-action="Skraning" method="post" class="row g-3">
+            <div class="col-12 form-check">
+                <input class="form-check-input" asp-for="Plus" />
+                <label class="form-check-label" asp-for="Plus">Plús 1</label>
+            </div>
+            <div class="col-12">
+                <label class="form-label" asp-for="Alergies">Fæðuóþol</label>
+                <input class="form-control" asp-for="Alergies" />
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-success me-2">Breyta</button>
+                <button type="submit" formaction="@Url.Action(\"KemstEkki\")" class="btn btn-danger"
+                        onclick="return confirm('Ææææ ertu alveg viss um að þú getir ekki verið með?\nVið höfum svo gaman as félagsskap þínum.');">
+                    Kemst ekki
+                </button>
+            </div>
+        </form>
+    </div>
+}
