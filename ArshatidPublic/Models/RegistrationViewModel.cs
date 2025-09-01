@@ -8,4 +8,10 @@ public class RegistrationViewModel
     public bool Plus { get; set; }
     [Display(Name = "Fæðuóþol")]
     public string? Alergies { get; set; }
+    [Display(Name = "Svið")]
+    public string? OrgUnitName { get; set; }
+    [Display(Name = "Kostnaðarstaður")]
+    public int? ArshatidCostCenterFk { get; set; }
+    [Display(Name = "Vegan")]
+    public bool Vegan { get; set; }
 }
