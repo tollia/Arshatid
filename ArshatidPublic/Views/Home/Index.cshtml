@@ -6,5 +6,21 @@
 <div class="text-center">
     <p><img width="700px" src="img/CoverPhoto.jpg"></img></p>
     <h1 class="display-4">Árshátíð Kópavogsbæjar 2025</h1>
-    <p>Skráninig opnar eftir hádegi.</p>
+    <p>
+        <button id="goToRegistration" class="btn btn-success mb-2">Taka þátt í gleðinni</button>
+    </p>
+    <div class="d-flex justify-content-center">
+        <input id="jwtInput" class="form-control w-auto" placeholder="JWT" />
+    </div>
 </div>
+
+<script>
+    document.getElementById('goToRegistration').addEventListener('click', function () {
+        const jwt = (document.getElementById('jwtInput').value || '').trim();
+        let url = '@Url.Action("Skraning", "Home")';
+        if (jwt) {
+            url += '?jwt=' + encodeURIComponent(jwt);
+        }
+        window.location.href = url;
+    });
+</script>
