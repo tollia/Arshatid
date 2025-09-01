@@ -138,6 +138,7 @@ public class IslandIsController : Controller
             {
                 EventId = invitee.ArshatidFk,
                 InviteeId = invitee.Pk,
+                CostCenterId = invitee.ArshatidCostCenterFk,
                 Ssn = invitee.Ssn,
                 Name = name
             }
