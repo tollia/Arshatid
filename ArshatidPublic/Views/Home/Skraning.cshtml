@@ -28,15 +28,38 @@
 
                 <div class="col-12">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" data-val="true" data-val-required="The Plús einn field is required." id="Plus" name="Plus" value="true">
+                        <input class="form-check-input" asp-for="Plus" />
                         <label class="form-check-label" asp-for="Plus"></label>
                     </div>
                 </div>
 
                 <div class="col-12">
+                    <label class="form-label" for="OrgUnitName">Svið</label>
+                    <select class="form-select" id="OrgUnitName" name="OrgUnitName">
+                        <option value="">- Veldu Svið -</option>
+                        @foreach (var ou in (IEnumerable<string>)ViewBag.OrgUnits)
+                        {
+                            <option value="@ou" @(Model.OrgUnitName == ou ? "selected" : "")>@ou</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label" for="ArshatidCostCenterFk">Kostnaðarstaður</label>
+                    <select class="form-select" id="ArshatidCostCenterFk" name="ArshatidCostCenterFk"></select>
+                </div>
+
+                <div class="col-12">
                     <label class="form-label" for="Alergies">Fæðuóþol</label>
-                    <textarea class="form-control" id="Alergies" name="Alergies" rows="3"></textarea>
+                    <textarea class="form-control" id="Alergies" name="Alergies" rows="3">@Model.Alergies</textarea>
                     <span class="text-danger field-validation-valid" data-valmsg-for="Alergies" data-valmsg-replace="true"></span>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="Vegan" />
+                        <label class="form-check-label" asp-for="Vegan"></label>
+                    </div>
                 </div>
 
                 <div class="col-12">
@@ -55,6 +78,28 @@
                     }
                 </div>
             </form>
+            <script>
+                const costCenters = @Html.Raw(ViewBag.CostCentersJson ?? "[]");
+                const orgSelect = document.getElementById('OrgUnitName');
+                const ccSelect = document.getElementById('ArshatidCostCenterFk');
+                function populateCostCenters() {
+                    ccSelect.innerHTML = '';
+                    const selectedOrg = orgSelect.value;
+                    if (!selectedOrg) return;
+                    const filtered = costCenters.filter(c => c.OrgUnitName === selectedOrg);
+                    filtered.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.Pk;
+                        opt.text = c.CostCenterName;
+                        if (@(Model.ArshatidCostCenterFk ?? 0) === c.Pk) {
+                            opt.selected = true;
+                        }
+                        ccSelect.appendChild(opt);
+                    });
+                }
+                orgSelect.addEventListener('change', populateCostCenters);
+                document.addEventListener('DOMContentLoaded', function () { populateCostCenters(); });
+            </script>
         </main>
     </div>
 }

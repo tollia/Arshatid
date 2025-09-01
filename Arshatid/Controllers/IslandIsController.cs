@@ -17,18 +17,21 @@ public class IslandIsController : Controller
     private readonly InviteeService _inviteeService;
     private readonly RegistrationService _registrationService;
     private readonly GeneralDbContext _generalDbContext;
+    private readonly ArshatidDbContext _dbContext;
 
     public IslandIsController(CurrentEventService currentEventService,
         ClaimsHelper claimsHelper,
         InviteeService inviteeService,
         RegistrationService registrationService,
-        GeneralDbContext generalDbContext)
+        GeneralDbContext generalDbContext,
+        ArshatidDbContext dbContext)
     {
         _currentEventService = currentEventService;
         _claimsHelper = claimsHelper;
         _inviteeService = inviteeService;
         _registrationService = registrationService;
         _generalDbContext = generalDbContext;
+        _dbContext = dbContext;
     }
 
     private static DateTime GetNowLocal()
@@ -82,7 +85,8 @@ public class IslandIsController : Controller
         }
 
         int plus = request.Plus ? 1 : 0;
-        ArshatidRegistration registration = _registrationService.Upsert(invitee, plus, request.Alergies);
+        invitee.ArshatidCostCenterFk = request.ArshatidCostCenterFk;
+        ArshatidRegistration registration = _registrationService.Upsert(invitee, plus, request.Alergies ?? string.Empty, request.Vegan);
         RegistrationDto dto = MapToDto(currentEvent, invitee, registration);
         return Ok(dto);
     }
@@ -108,6 +112,17 @@ public class IslandIsController : Controller
         return NoContent();
     }
 
+    [AllowAnonymous]
+    [HttpGet("costcenters")]
+    public ActionResult<IEnumerable<ArshatidCostCenter>> GetCostCenters()
+    {
+        var centers = _dbContext.ArshatidCostCenters
+            .OrderBy(c => c.OrgUnitName)
+            .ThenBy(c => c.CostCenterName)
+            .ToList();
+        return Ok(centers);
+    }
+
     private RegistrationDto MapToDto(ArshatidModels.Models.EF.Arshatid currentEvent, ArshatidInvitee invitee, ArshatidRegistration registration)
     {
         string name = _generalDbContext.Person
@@ -117,6 +132,8 @@ public class IslandIsController : Controller
         {
             RegistrationId = registration.Pk,
             Plus = registration.Plus,
+            Vegan = registration.Vegan,
+            ArshatidCostCenterFk = invitee.ArshatidCostCenterFk,
             Invitee = new InviteeDto
             {
                 EventId = invitee.ArshatidFk,

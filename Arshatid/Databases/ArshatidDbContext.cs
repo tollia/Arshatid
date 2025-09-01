@@ -15,6 +15,7 @@ namespace Arshatid.Databases
         public DbSet<ArshatidImageType> ArshatidImageTypes { get; set; }
         public DbSet<ArshatidInvitee> ArshatidInvitees { get; set; }
         public DbSet<ArshatidRegistration> ArshatidRegistrations { get; set; }
+        public DbSet<ArshatidCostCenter> ArshatidCostCenters { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,15 +27,21 @@ namespace Arshatid.Databases
             modelBuilder.Entity<ArshatidRegistration>().ToTable("ArshatidRegistration", "dbo");
             modelBuilder.Entity<ArshatidImage>().ToTable("ArshatidImage", "dbo");
             modelBuilder.Entity<ArshatidImageType>().ToTable("ArshatidImageType", "dbo");
+            modelBuilder.Entity<ArshatidCostCenter>().ToTable("ArshatidCostCenter", "dbo");
 
-            // ArshatidEvent (principal) 1—* ArshatidInvitee (dependent)
+            // ArshatidEvent (principal) 1* ArshatidInvitee (dependent)
             modelBuilder.Entity<ArshatidInvitee>()
                 .HasOne(i => i.Event)
                 .WithMany(e => e.Invitees)
                 .HasForeignKey(i => i.ArshatidFk)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ArshatidInvitee (principal) 1—* ArshatidRegistration (dependent)
+            modelBuilder.Entity<ArshatidInvitee>()
+                .HasOne(i => i.CostCenter)
+                .WithMany(c => c.Invitees)
+                .HasForeignKey(i => i.ArshatidCostCenterFk);
+
+            // ArshatidInvitee (principal) 1* ArshatidRegistration (dependent)
             modelBuilder.Entity<ArshatidRegistration>()
                 .HasOne(r => r.Invitee)
                 .WithMany(i => i.Registrations)

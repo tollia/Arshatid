@@ -21,8 +21,13 @@ public class ArshatidInvitee
 
     public int ArshatidFk { get; set; }
 
+    public int? ArshatidCostCenterFk { get; set; }
+
     [ForeignKey(nameof(ArshatidFk))]
     public virtual Arshatid Event { get; set; } = null!;
+
+    [ForeignKey(nameof(ArshatidCostCenterFk))]
+    public virtual ArshatidCostCenter? CostCenter { get; set; }
 
     public virtual ICollection<ArshatidRegistration> Registrations { get; set; } = new List<ArshatidRegistration>();
 }
