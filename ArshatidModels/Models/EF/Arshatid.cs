@@ -30,5 +30,4 @@ public class Arshatid
 
     public virtual ICollection<ArshatidImage> Images { get; set; } = new List<ArshatidImage>();
     public virtual ICollection<ArshatidInvitee> Invitees { get; set; } = new List<ArshatidInvitee>();
-    public virtual ICollection<ArshatidRegistration> Registrations { get; set; } = new List<ArshatidRegistration>();
 }
