@@ -1,28 +1,40 @@
 @model ArshatidPublic.Models.RegistrationViewModel
-
-<p><img width="700px" src="img/CoverPhoto.jpg" /></p>
-<h1>Skráning</h1>
-
-@if (ViewBag.NotInvitedMessage != null)
-{
-    <div class="alert alert-warning">@ViewBag.NotInvitedMessage</div>
+@{
+    ViewData["Title"] = "Skráning";
+    Layout = "_Layout_plain";
 }
-else
+
+
+@* Show warning if user is not invited *@
+@if (ViewBag.NotInvitedMessage is string notInv && !string.IsNullOrWhiteSpace(notInv))
+{
+    <div class="alert alert-warning">@notInv</div>
+}
+
+@* Otherwise show the form *@
+@if (ViewBag.NotInvitedMessage == null)
 {
     <div class="container mt-3">
-        <form asp-action="Skraning" method="post" class="row g-3">
-            <div class="col-12 form-check">
-                <input class="form-check-input" asp-for="Plus" />
-                <label class="form-check-label" asp-for="Plus">Plús 1</label>
-            </div>
+        <form asp-controller="Home" asp-action="Skraning" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="col-12">
-                <label class="form-label" asp-for="Alergies">Fæðuóþol</label>
+                <label class="form-label" asp-for="Alergies"></label>
                 <input class="form-control" asp-for="Alergies" />
+                <span class="text-danger" asp-validation-for="Alergies"></span>
             </div>
+
             <div class="col-12">
                 <button type="submit" class="btn btn-success me-2">Breyta</button>
-                <button type="submit" formaction="@Url.Action(\"KemstEkki\")" class="btn btn-danger"
-                        onclick="return confirm('Ææææ ertu alveg viss um að þú getir ekki verið með?\nVið höfum svo gaman as félagsskap þínum.');">
+
+                @* Separate post to Home/KemstEkki, keeping it inline *@
+                <button type="submit"
+                        class="btn btn-danger"
+                        formaction='@Url.Action("KemstEkki", "Home")'
+                        formmethod="post"
+                        onclick="return confirm('Ertu alveg viss um að þú getir ekki verið með? Við höfum svo gaman af félagsskap þínum.');">
                     Kemst ekki
                 </button>
             </div>
