@@ -51,12 +51,12 @@ namespace ArshatidPublic.Classes
                 return jwt;
             }
 
-            // 2. If not found, search inside any complex model objects for a "Jwt" property.
+            // 2. If not found, search inside any complex model objects for a "JwtToken" property.
             foreach (var argument in actionArguments.Values)
             {
                 if (argument == null) continue;
 
-                var property = argument.GetType().GetProperty("Jwt",
+                var property = argument.GetType().GetProperty("JwtToken",
                     System.Reflection.BindingFlags.Public |
                     System.Reflection.BindingFlags.Instance |
                     System.Reflection.BindingFlags.IgnoreCase);

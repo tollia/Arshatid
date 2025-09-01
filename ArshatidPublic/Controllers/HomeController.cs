@@ -2,6 +2,7 @@ using ArshatidModels.Dtos;
 using ArshatidModels.Models.EF;
 using ArshatidPublic.Classes;
 using ArshatidPublic.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
@@ -32,8 +33,9 @@ namespace ArshatidPublic.Controllers
         }
 
         [HttpPost]
+        [HttpGet]
         [ManualJwtSignIn]
-        public async Task<IActionResult> Skraning(string? jwt)
+        public async Task<IActionResult> Skraning(string jwt)
         {
             ViewBag.Name = User.Identity?.Name ?? "Óþekktur aðili";
 
@@ -73,13 +75,14 @@ namespace ArshatidPublic.Controllers
                 model.Vegan = registration.Vegan;
                 model.ArshatidCostCenterFk = registration.ArshatidCostCenterFk;
             }
+            model.JwtToken = HttpContext.Items["jwt_token"].ToString();
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ManualJwtSignIn]
-        public async Task<IActionResult> SkraningUpsert(RegistrationViewModel model)
+        public async Task<IActionResult> SkraningUpsert([FromForm] string jwt, RegistrationViewModel model)
         {
             var client = _clientFactory.CreateClient("ArshatidApi");
             var request = new UpsertRegistrationRequest
@@ -87,16 +90,20 @@ namespace ArshatidPublic.Controllers
                 Plus = model.Plus,
                 Alergies = model.Alergies,
                 Vegan = model.Vegan,
-                ArshatidCostCenterFk = model.ArshatidCostCenterFk
+                ArshatidCostCenterFk = model.ArshatidCostCenterFk,
+                JwtToken = model.JwtToken
             };
             await client.PutAsJsonAsync("registration", request);
-            return RedirectToAction(nameof(Skraning));
+            return RedirectToAction(
+                nameof(Skraning),
+                new { jwt = model.JwtToken }
+            );
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ManualJwtSignIn]
-        public async Task<IActionResult> KemstEkki()
+        public async Task<IActionResult> KemstEkki(string jwt)
         {
             var client = _clientFactory.CreateClient("ArshatidApi");
             await client.DeleteAsync("registration");
