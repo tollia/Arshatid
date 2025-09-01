@@ -21,22 +21,32 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="col-12">
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Plus" />
+                    <label class="form-check-label" asp-for="Plus">Plús einn</label>
+                </div>
+            </div>
+
+            <div class="col-12">
                 <label class="form-label" asp-for="Alergies"></label>
                 <input class="form-control" asp-for="Alergies" />
                 <span class="text-danger" asp-validation-for="Alergies"></span>
             </div>
 
             <div class="col-12">
-                <button type="submit" class="btn btn-success me-2">Breyta</button>
+                <button type="submit" class="btn btn-success me-2">@((ViewBag.HasRegistration ?? false) ? "Breyta" : "Skrá")</button>
 
                 @* Separate post to Home/KemstEkki, keeping it inline *@
-                <button type="submit"
-                        class="btn btn-danger"
-                        formaction='@Url.Action("KemstEkki", "Home")'
-                        formmethod="post"
-                        onclick="return confirm('Ertu alveg viss um að þú getir ekki verið með? Við höfum svo gaman af félagsskap þínum.');">
-                    Kemst ekki
-                </button>
+                @if (ViewBag.HasRegistration ?? false)
+                {
+                    <button type="submit"
+                            class="btn btn-danger"
+                            formaction='@Url.Action("KemstEkki", "Home")'
+                            formmethod="post"
+                            onclick="return confirm('Ertu alveg viss um að þú getir ekki verið með? Við höfum svo gaman af félagsskap þínum.');">
+                        Kemst ekki
+                    </button>
+                }
             </div>
         </form>
     </div>
