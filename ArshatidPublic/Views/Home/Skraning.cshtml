@@ -4,6 +4,9 @@
     Layout = "_Layout_plain";
 }
 
+<p>
+    <img src="~/img/CoverPhoto.jpg" class="img-fluid" alt="Event Cover Photo">
+</p>
 
 @* Show warning if user is not invited *@
 @if (ViewBag.NotInvitedMessage is string notInv && !string.IsNullOrWhiteSpace(notInv))
@@ -14,40 +17,44 @@
 @* Otherwise show the form *@
 @if (ViewBag.NotInvitedMessage == null)
 {
-    <div class="container mt-3">
-        <form asp-controller="Home" asp-action="Skraning" method="post" class="row g-3">
-            @Html.AntiForgeryToken()
+    <div b-191jc0ugh8="" class="container" style="max-width: 1000px;">
+        <main b-191jc0ugh8="" role="main" class="pb-3">
+            <form asp-controller="Home" asp-action="Skraning" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="col-12">
-                <div class="form-check">
-                    <input class="form-check-input" asp-for="Plus" />
-                    <label class="form-check-label" asp-for="Plus">Plús einn</label>
+                <h3>Heill sé þér @User.Identity.Name</h3>
+
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" data-val="true" data-val-required="The Plús einn field is required." id="Plus" name="Plus" value="true">
+                        <label class="form-check-label" asp-for="Plus"></label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-12">
-                <label class="form-label" asp-for="Alergies"></label>
-                <input class="form-control" asp-for="Alergies" />
-                <span class="text-danger" asp-validation-for="Alergies"></span>
-            </div>
+                <div class="col-12">
+                    <label class="form-label" for="Alergies">Fæðuóþol</label>
+                    <textarea class="form-control" id="Alergies" name="Alergies" rows="3"></textarea>
+                    <span class="text-danger field-validation-valid" data-valmsg-for="Alergies" data-valmsg-replace="true"></span>
+                </div>
 
-            <div class="col-12">
-                <button type="submit" class="btn btn-success me-2">@((ViewBag.HasRegistration ?? false) ? "Breyta" : "Skrá")</button>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success me-2">@((ViewBag.HasRegistration ?? false) ? "Breyta" : "Skrá")</button>
 
-                @* Separate post to Home/KemstEkki, keeping it inline *@
-                @if (ViewBag.HasRegistration ?? false)
-                {
-                    <button type="submit"
-                            class="btn btn-danger"
-                            formaction='@Url.Action("KemstEkki", "Home")'
-                            formmethod="post"
-                            onclick="return confirm('Ertu alveg viss um að þú getir ekki verið með? Við höfum svo gaman af félagsskap þínum.');">
-                        Kemst ekki
-                    </button>
-                }
-            </div>
-        </form>
+                    @* Separate post to Home/KemstEkki, keeping it inline *@
+                    @if (ViewBag.HasRegistration ?? false)
+                    {
+                        <button type="submit"
+                                class="btn btn-danger"
+                                formaction='@Url.Action("KemstEkki", "Home")'
+                                formmethod="post"
+                                onclick="return confirm('Ertu alveg viss um að þú getir ekki verið með? Við höfum svo gaman af félagsskap þínum.');">
+                            Kemst ekki
+                        </button>
+                    }
+                </div>
+            </form>
+        </main>
     </div>
 }
