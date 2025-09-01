@@ -40,8 +40,8 @@ namespace ArshatidPublic.Controllers
 
             HttpClient client = _clientFactory.CreateClient("ArshatidApi");
             HttpResponseMessage response = await client.GetAsync("registration");
-            var centersResponse = await client.GetAsync("costcenters");
-            var costCenters = centersResponse.IsSuccessStatusCode
+            HttpResponseMessage centersResponse = await client.GetAsync("costcenters");
+            List<ArshatidCostCenter> costCenters = centersResponse.IsSuccessStatusCode
                 ? await centersResponse.Content.ReadFromJsonAsync<List<ArshatidCostCenter>>()
                 : new List<ArshatidCostCenter>();
             ViewBag.CostCentersJson = JsonSerializer.Serialize(costCenters);
@@ -51,12 +51,6 @@ namespace ArshatidPublic.Controllers
                 .Distinct()
                 .OrderBy(n => n)
                 .ToList();
-
-            var abc = costCenters
-                .Select(c => c.OrgUnitName)
-                .Distinct()
-                .OrderBy(n => n)
-                .ToList()
 
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
