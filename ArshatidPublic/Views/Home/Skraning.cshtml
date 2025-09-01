@@ -36,10 +36,17 @@
                 <div class="col-12">
                     <label class="form-label" for="OrgUnitName">Svið</label>
                     <select class="form-select" id="OrgUnitName" name="OrgUnitName">
-                        <option value="">- Veldu Svið -</option>
-                        @foreach (var ou in (IEnumerable<string>)ViewBag.OrgUnits)
+                        <option value="">Veldu svið</option>
+                        @foreach (string ou in (IEnumerable<string>)ViewBag.OrgUnits)
                         {
-                            <option value="@ou" @(Model.OrgUnitName == ou ? "selected" : "")>@ou</option>
+                            if (string.Equals(Model.OrgUnitName, ou, StringComparison.Ordinal))
+                            {
+                                <option value="@ou" selected>@ou</option>
+                            }
+                            else
+                            {
+                                <option value="@ou">@ou</option>
+                            }
                         }
                     </select>
                 </div>
