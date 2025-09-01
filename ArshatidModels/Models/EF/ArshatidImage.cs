@@ -10,7 +10,7 @@ public class ArshatidImage
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Pk { get; set; }
 
-    [Column("ArshatifFk")]
+    [Column("ArshatidFk")]
     public int ArshatidFk { get; set; }
 
     [Required]

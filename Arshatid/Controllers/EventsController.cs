@@ -1,7 +1,5 @@
 using Arshatid.Databases;
-using ArshatidModels.Models.EF;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Arshatid.Controllers;
 
