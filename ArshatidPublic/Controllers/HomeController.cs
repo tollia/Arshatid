@@ -52,6 +52,7 @@ namespace ArshatidPublic.Controllers
 
             var registration = await response.Content.ReadFromJsonAsync<RegistrationDto>();
             var model = new RegistrationViewModel();
+            ViewBag.HasRegistration = registration != null;
             if (registration != null)
             {
                 model.Plus = registration.Plus == 1;
