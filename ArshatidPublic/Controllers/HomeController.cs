@@ -63,7 +63,12 @@ namespace ArshatidPublic.Controllers
                 return View(new RegistrationViewModel());
             }
 
-            var registration = await response.Content.ReadFromJsonAsync<RegistrationDto>();
+            RegistrationDto? registration = null;
+            if (response.StatusCode != HttpStatusCode.NoContent)
+            {
+                registration = await response.Content.ReadFromJsonAsync<RegistrationDto>();
+            }
+
             var model = new RegistrationViewModel();
             ViewBag.HasRegistration = registration != null;
             if (registration != null)
