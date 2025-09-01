@@ -115,11 +115,11 @@ public class IslandIsController : Controller
 
         return new RegistrationDto
         {
-            EventId = registration.Invitee.ArshatidFk,
             RegistrationId = registration.Pk,
             Plus = registration.Plus,
             Invitee = new InviteeDto
             {
+                EventId = invitee.ArshatidFk,
                 InviteeId = invitee.Pk,
                 Ssn = invitee.Ssn,
                 Name = name
