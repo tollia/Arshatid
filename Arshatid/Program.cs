@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using QuestPDF.Infrastructure;
 using System.Diagnostics;
 using System.Globalization;
+using Microsoft.OpenApi.Models;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +65,15 @@ builder.Services.AddScoped<CurrentEventService>();
 builder.Services.AddScoped<ClaimsHelper>();
 builder.Services.AddScoped<InviteeService>();
 builder.Services.AddScoped<RegistrationService>();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Arshatid API", Version = "v1" });
+    options.DocInclusionPredicate((_, api) =>
+        api.RelativePath != null &&
+        api.RelativePath.StartsWith("islandapi", StringComparison.OrdinalIgnoreCase));
+});
+
 
 
 // Add services to the container.
@@ -114,6 +124,12 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Arshatid API V1");
+});
 
 app.MapControllerRoute(
     name: "default",
