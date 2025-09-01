@@ -80,7 +80,7 @@ namespace ArshatidPublic.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ManualJwtSignIn]
-        public async Task<IActionResult> Skraning(RegistrationViewModel model)
+        public async Task<IActionResult> SkraningUpsert(RegistrationViewModel model)
         {
             var client = _clientFactory.CreateClient("ArshatidApi");
             var request = new UpsertRegistrationRequest
