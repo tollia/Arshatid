@@ -34,26 +34,14 @@
                 </div>
 
                 <div class="col-12">
-                    <label class="form-label" for="OrgUnitName">Svið</label>
-                    <select class="form-select" id="OrgUnitName" name="OrgUnitName">
-                        <option value="">Veldu svið</option>
-                        @foreach (string ou in (IEnumerable<string>)ViewBag.OrgUnits)
-                        {
-                            if (string.Equals(Model.OrgUnitName, ou, StringComparison.Ordinal))
-                            {
-                                <option value="@ou" selected>@ou</option>
-                            }
-                            else
-                            {
-                                <option value="@ou">@ou</option>
-                            }
-                        }
+                    <label class="form-label" asp-for="ArshatidCostCenterFk"></label>
+                    <select class="form-select js-choices"
+                            asp-for="ArshatidCostCenterFk"
+                            asp-items="@(ViewBag.CostCenters as IEnumerable<SelectListItem>)"
+                            data-placeholder="Veldu kostnaðarstað">
+                        <option value="">Veldu kostnaðarstað</option>
                     </select>
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label" for="ArshatidCostCenterFk">Kostnaðarstaður</label>
-                    <select class="form-select" id="ArshatidCostCenterFk" name="ArshatidCostCenterFk"></select>
+                    <span class="text-danger" asp-validation-for="ArshatidCostCenterFk"></span>
                 </div>
 
                 <div class="col-12">
@@ -85,28 +73,29 @@
                     }
                 </div>
             </form>
-            <script>
-                const costCenters = @Html.Raw(ViewBag.CostCentersJson ?? "[]");
-                const orgSelect = document.getElementById('OrgUnitName');
-                const ccSelect = document.getElementById('ArshatidCostCenterFk');
-                function populateCostCenters() {
-                    ccSelect.innerHTML = '';
-                    const selectedOrg = orgSelect.value;
-                    if (!selectedOrg) return;
-                    const filtered = costCenters.filter(c => c.OrgUnitName === selectedOrg);
-                    filtered.forEach(c => {
-                        const opt = document.createElement('option');
-                        opt.value = c.Pk;
-                        opt.text = c.CostCenterName;
-                        if (@(Model.ArshatidCostCenterFk ?? 0) === c.Pk) {
-                            opt.selected = true;
-                        }
-                        ccSelect.appendChild(opt);
-                    });
-                }
-                orgSelect.addEventListener('change', populateCostCenters);
-                document.addEventListener('DOMContentLoaded', function () { populateCostCenters(); });
-            </script>
         </main>
     </div>
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css" />
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-choices').forEach(function (el) {
+                new Choices(el, {
+                    searchEnabled: true,
+                    shouldSort: false,
+                    removeItemButton: false,
+                    allowHTML: false,
+                    placeholder: true,
+                    placeholderValue: el.dataset.placeholder || 'Veldu…'
+                });
+            });
+        });
+    </script>
 }
