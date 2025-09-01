@@ -46,7 +46,7 @@ namespace ArshatidPublic.Controllers
                 : new List<ArshatidCostCenter>();
             ViewBag.CostCenters = costCenters
                 .OrderBy(c => c.CostCenterName)
-                .Select(c => new SelectListItem(c.CostCenterName, c.Pk.ToString()))
+                .Select(c => new SelectListItem(c.OrgUnitName + " - " + c.CostCenterName, c.Pk.ToString()))
                 .ToList();
 
             if (response.StatusCode == HttpStatusCode.BadRequest)
