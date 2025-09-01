@@ -19,9 +19,10 @@ public class RegistrationService
     }
 
     public ArshatidRegistration Upsert(
-        ArshatidInvitee invitee, 
-        int plus, 
-        string alergies
+        ArshatidInvitee invitee,
+        int plus,
+        string alergies,
+        bool vegan
     )
     {
         ArshatidRegistration? registration = GetByInvitee(invitee);
@@ -36,7 +37,8 @@ public class RegistrationService
             {
                 ArshatidInviteeFk = invitee.Pk,
                 Plus = plus,
-                Alergies = alergies
+                Alergies = alergies,
+                Vegan = vegan
             };
             _dbContext.ArshatidRegistrations.Add(registration);
         }
@@ -44,6 +46,7 @@ public class RegistrationService
         {
             registration.Plus = plus;
             registration.Alergies = alergies;
+            registration.Vegan = vegan;
             _dbContext.ArshatidRegistrations.Update(registration);
         }
 
