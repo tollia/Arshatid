@@ -11,7 +11,6 @@ builder.Services.AddTransient<ApiTokenHandler>();
 builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient("ArshatidApi", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ArshatidApi:BaseUrl"]!);
@@ -20,8 +19,10 @@ builder.Services.AddHttpClient("ArshatidApi", client =>
     {
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
-});
+})
+.AddHttpMessageHandler<ApiTokenHandler>();
 
+builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
