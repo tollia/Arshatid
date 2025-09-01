@@ -3,6 +3,7 @@ CREATE  TABLE TolliTest.dbo.ArshatidInvitee (
 	Ssn                  varchar(10)      NOT NULL,
 	FullName             nvarchar(255)      NOT NULL,
 	ArshatidFk           int      NOT NULL,
+	ArshatidCostCenterFk int      NULL,
 	CONSTRAINT pk_ArshatidInvitees PRIMARY KEY  ( pk ) ,
 	CONSTRAINT unq_ArshatidInvitee UNIQUE ( ArshatidFk, Ssn ) ,
 	CONSTRAINT ck_ArshatidInvitee_SsnLen CHECK ( len([Ssn])=(10) ),
@@ -11,4 +12,5 @@ CREATE  TABLE TolliTest.dbo.ArshatidInvitee (
 
 ALTER TABLE TolliTest.dbo.ArshatidInvitee ADD CONSTRAINT fk_arshatidinvitees_arshatid FOREIGN KEY ( ArshatidFk ) REFERENCES TolliTest.dbo.Arshatid( Pk );
 
+ALTER TABLE TolliTest.dbo.ArshatidInvitee ADD CONSTRAINT fk_arshatidinvitee FOREIGN KEY ( ArshatidCostCenterFk ) REFERENCES TolliTest.dbo.ArshatidCostCenter( Pk );
 
