@@ -86,6 +86,8 @@ public class IslandIsController : Controller
 
         int plus = request.Plus ? 1 : 0;
         invitee.ArshatidCostCenterFk = request.ArshatidCostCenterFk;
+        _dbContext.ArshatidInvitees.Update(invitee);
+        _dbContext.SaveChanges();
         ArshatidRegistration registration = _registrationService.Upsert(invitee, plus, request.Alergies ?? string.Empty, request.Vegan);
         RegistrationDto dto = MapToDto(currentEvent, invitee, registration);
         return Ok(dto);
