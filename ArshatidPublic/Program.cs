@@ -14,7 +14,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient("ArshatidApi", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ArshatidApi:BaseUrl"]!);
-    var token = builder.Configuration["ArshatidApi:Jwt"];
+    var token = builder.Configuration["ArshatidApi:JwtToken"];
     if (!string.IsNullOrWhiteSpace(token))
     {
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

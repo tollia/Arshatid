@@ -12,4 +12,5 @@ public class RegistrationViewModel
     public int? ArshatidCostCenterFk { get; set; }
     [Display(Name = "Vegan")]
     public bool Vegan { get; set; }
+    public string JwtToken { get; set; } = string.Empty;
 }

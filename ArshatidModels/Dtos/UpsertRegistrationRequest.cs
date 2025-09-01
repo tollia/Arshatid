@@ -6,4 +6,5 @@ public sealed class UpsertRegistrationRequest
     public string? Alergies { get; set; } = null!;
     public bool Vegan { get; set; } = false;
     public int? ArshatidCostCenterFk { get; set; }
+    public string JwtToken { get; set; }
 }
