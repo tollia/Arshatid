@@ -17,6 +17,8 @@ public class ArshatidRegistration
     [StringLength(255)]
     public string? Alergies { get; set; }
 
+    public bool Vegan { get; set; } = false;
+
     [Required]
     public int ArshatidInviteeFk { get; set; }
 

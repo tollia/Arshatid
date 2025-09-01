@@ -1,10 +1,12 @@
 using ArshatidModels.Dtos;
+using ArshatidModels.Models.EF;
 using ArshatidPublic.Classes;
 using ArshatidPublic.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace ArshatidPublic.Controllers
 {
@@ -38,6 +40,17 @@ namespace ArshatidPublic.Controllers
 
             HttpClient client = _clientFactory.CreateClient("ArshatidApi");
             HttpResponseMessage response = await client.GetAsync("registration");
+            var centersResponse = await client.GetAsync("costcenters");
+            var costCenters = centersResponse.IsSuccessStatusCode
+                ? await centersResponse.Content.ReadFromJsonAsync<List<ArshatidCostCenter>>()
+                : new List<ArshatidCostCenter>();
+            ViewBag.CostCentersJson = JsonSerializer.Serialize(costCenters);
+            ViewBag.OrgUnits = costCenters
+                .Where(c => c.IsDivision)
+                .Select(c => c.OrgUnitName)
+                .Distinct()
+                .OrderBy(n => n)
+                .ToList();
 
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -56,6 +69,13 @@ namespace ArshatidPublic.Controllers
             if (registration != null)
             {
                 model.Plus = registration.Plus == 1;
+                model.Vegan = registration.Vegan;
+                model.ArshatidCostCenterFk = registration.ArshatidCostCenterFk;
+                if (model.ArshatidCostCenterFk != null)
+                {
+                    var selected = costCenters.FirstOrDefault(c => c.Pk == model.ArshatidCostCenterFk);
+                    model.OrgUnitName = selected?.OrgUnitName;
+                }
             }
             return View(model);
         }
@@ -69,7 +89,9 @@ namespace ArshatidPublic.Controllers
             var request = new UpsertRegistrationRequest
             {
                 Plus = model.Plus,
-                Alergies = model.Alergies
+                Alergies = model.Alergies,
+                Vegan = model.Vegan,
+                ArshatidCostCenterFk = model.ArshatidCostCenterFk
             };
             await client.PutAsJsonAsync("registration", request);
             return RedirectToAction(nameof(Skraning));
