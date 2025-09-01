@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -14,7 +15,7 @@ namespace Arshatid.TagHelpers
         [HtmlAttributeName(ForAttributeName)]
         public ModelExpression For { get; set; } = default!;
 
-        // Optional per-field overrides (initializer supplies defaults if omitted)
+        // Optional per-field overrides used by your JS initializer
         [HtmlAttributeName("locale")] public string? Locale { get; set; }
         [HtmlAttributeName("hour-cycle")] public string? HourCycle { get; set; }
         [HtmlAttributeName("display-format")] public string? DisplayFormat { get; set; }
@@ -26,26 +27,35 @@ namespace Arshatid.TagHelpers
         [HtmlAttributeName("input-class")] public string? InputClass { get; set; }
         [HtmlAttributeName("container-class")] public string? ContainerClass { get; set; }
         [HtmlAttributeName("group-class")] public string? GroupClass { get; set; }
-        [HtmlAttributeName("toggle-class")] public string? ToggleClass { get; set; } // extra classes for the button
-        [HtmlAttributeName("toggle-icon")] public string? ToggleIcon { get; set; }   // e.g. "bi bi-calendar3"
+        [HtmlAttributeName("toggle-class")] public string? ToggleClass { get; set; }
+        [HtmlAttributeName("toggle-icon")] public string? ToggleIcon { get; set; }
 
         [ViewContext]
         [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; } = default!;
+        public ViewContext ViewContext { get; set; } = default!; // kept for future needs; not used here
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            string fullName = For.Name; // e.g., "EventTime" or "Events[0].EventTime"
+            string fullName = For.Name;                           // e.g., "EventTime" or "Events[0].EventTime"
             string baseId = TagBuilder.CreateSanitizedId(fullName, "_");
-            string groupId = baseId + "_group";
             string displayId = baseId + "_display";
             string hiddenId = baseId + "_value";
+            string groupId = baseId + "_group";
             string labelText = For.Metadata.DisplayName ?? fullName;
+
+            // Resolve model value (server-side) and format both ISO + display text
+            DateTime? value = null;
+            if (For.Model is DateTime dt) { value = dt; }
+            else if (For.Model is DateTimeOffset dto) { value = dto.LocalDateTime; }
+
+            string isoValue = value.HasValue ? value.Value.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture) : string.Empty;
+            string displayFmt = DisplayFormat ?? "dd.MM.yyyy HH:mm";
+            CultureInfo isIs = CultureInfo.GetCultureInfo("is-IS");
+            string displayText = value.HasValue ? value.Value.ToString(displayFmt, isIs) : string.Empty;
 
             // Wrapper
             output.TagName = "div";
             output.TagMode = TagMode.StartTagAndEndTag;
-
             output.Attributes.SetAttribute("class", CombineWrapperClasses("mb-3", ContainerClass, output));
 
             // Label
@@ -54,32 +64,31 @@ namespace Arshatid.TagHelpers
             label.AddCssClass(CombineClasses("form-label", LabelClass));
             label.InnerHtml.Append(labelText);
 
-            // Input group (make both input and button target this group)
+            // Input group
             TagBuilder group = new TagBuilder("div");
             group.Attributes["id"] = groupId;
             group.AddCssClass(CombineClasses("input-group", GroupClass));
 
-            // Visible input (no name; TD binds to it)
+            // Visible input (seeded server-side so it’s never blank)
             TagBuilder visible = new TagBuilder("input");
             visible.Attributes["type"] = "text";
             visible.Attributes["id"] = displayId;
-            visible.Attributes["data-td-target"] = "#" + displayId;
+            visible.Attributes["value"] = displayText;                        // <= server-seeded
             visible.AddCssClass(CombineClasses("form-control td-datetime", InputClass));
-
-            // Optional per-field overrides (read by your initializer)
+            // Your initializer will read these data-attrs and instantiate TD on the input
+            visible.Attributes["data-td-target"] = "#" + displayId;           // target the input itself
             if (!string.IsNullOrEmpty(Locale)) visible.Attributes["data-td-locale"] = Locale;
             if (!string.IsNullOrEmpty(HourCycle)) visible.Attributes["data-td-hourcycle"] = HourCycle;
             if (!string.IsNullOrEmpty(DisplayFormat)) visible.Attributes["data-td-display-format"] = DisplayFormat;
             if (Seconds.HasValue) visible.Attributes["data-td-seconds"] = Seconds.Value ? "true" : "false";
             if (Step.HasValue) visible.Attributes["data-td-step"] = Step.Value.ToString(CultureInfo.InvariantCulture);
 
-            // Toggle button (fully clickable, no grey input-group-text)
+            // Toggle button (calendar icon)
             TagBuilder btn = new TagBuilder("button");
             btn.Attributes["type"] = "button";
             btn.AddCssClass(CombineClasses("btn btn-outline-secondary border-start-0", ToggleClass));
-            btn.Attributes["data-td-target"] = "#" + displayId;         // ✅
+            btn.Attributes["data-td-target"] = "#" + displayId;               // click targets the input
             btn.Attributes["data-td-toggle"] = "datetimepicker";
-            // Icon
             TagBuilder icon = new TagBuilder("i");
             icon.AddCssClass(string.IsNullOrWhiteSpace(ToggleIcon) ? "bi bi-calendar3" : ToggleIcon!);
             btn.InnerHtml.AppendHtml(icon);
@@ -87,15 +96,12 @@ namespace Arshatid.TagHelpers
             group.InnerHtml.AppendHtml(visible);
             group.InnerHtml.AppendHtml(btn);
 
-            // Hidden field (model-bound ISO value)
+            // Hidden ISO field used for model binding
             TagBuilder hidden = new TagBuilder("input");
             hidden.Attributes["type"] = "hidden";
             hidden.Attributes["id"] = hiddenId;
-            hidden.Attributes["name"] = fullName; // critical for model binding
-            if (For.Model is DateTime dt)
-                hidden.Attributes["value"] = dt.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture);
-            else if (For.Model is DateTimeOffset dto)
-                hidden.Attributes["value"] = dto.LocalDateTime.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture);
+            hidden.Attributes["name"] = fullName;
+            hidden.Attributes["value"] = isoValue;
 
             // Validation span
             TagBuilder validation = new TagBuilder("span");
@@ -114,16 +120,18 @@ namespace Arshatid.TagHelpers
         {
             StringBuilder sb = new StringBuilder(defaults);
             if (output.Attributes.TryGetAttribute("class", out TagHelperAttribute existingAttr) &&
-                existingAttr.Value is string existing &&
-                !string.IsNullOrWhiteSpace(existing))
+                existingAttr.Value is string existing && !string.IsNullOrWhiteSpace(existing))
             {
                 sb.Append(' ').Append(existing);
             }
-            if (!string.IsNullOrWhiteSpace(extra)) sb.Append(' ').Append(extra);
+            if (!string.IsNullOrWhiteSpace(extra))
+            {
+                sb.Append(' ').Append(extra);
+            }
             return sb.ToString();
         }
 
         private static string CombineClasses(string defaults, string? extra)
-            => string.IsNullOrWhiteSpace(extra) ? defaults : (defaults + " " + extra);
+            => string.IsNullOrWhiteSpace(extra) ? defaults : defaults + " " + extra;
     }
 }

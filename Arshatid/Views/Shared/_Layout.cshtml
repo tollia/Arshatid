@@ -75,126 +75,134 @@
     <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
         (function () {
           "use strict";
 
+          // ---- helpers ----
           const GLOBAL = window.TD_DEFAULTS || {};
           const pad = n => String(n).padStart(2, "0");
-          const toLocalIso = d =>
+          const toIsoLocal = d =>
             `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
           const pickBool = (v, fb) => (v == null ? fb : /^(true|1)$/i.test(String(v)));
 
-          function formatDisplay(d, fmt) {
-              return fmt
-                .replace(/yyyy/g, String(d.getFullYear()))
-                .replace(/MM/g,   pad(d.getMonth()+1))
-                .replace(/dd/g,   pad(d.getDate()))
-                .replace(/HH/g,   pad(d.getHours()))
-                .replace(/mm/g,   pad(d.getMinutes()))
-                .replace(/ss/g,   pad(d.getSeconds()));
-            }
-          function findHidden(input) {
-            // convention: <id>_display -> <id>_value
+          // parse 'yyyy-MM-ddTHH:mm' as LOCAL (no timezone shift)
+          function parseIsoLocal(iso) {
+            if (!iso) return null;
+            const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(iso);
+            if (!m) return null;
+            return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], 0, 0);
+          }
+
+          // Convert JS Date -> TD DateTime (support different builds)
+          function toTD(jsDate) {
+            if (!(jsDate instanceof Date) || Number.isNaN(jsDate.getTime())) return null;
+            const TD = window.tempusDominus;
+            try {
+              if (TD?.DateTime?.fromJSDate) return TD.DateTime.fromJSDate(jsDate);
+              if (TD?.DateTime?.convert)    return TD.DateTime.convert(jsDate);
+              if (TD?.DateTime)             return new TD.DateTime(jsDate);
+            } catch { /* ignore */ }
+            return null;
+          }
+
+          // Find hidden partner for a visible input with id ..._display
+          function hiddenFor(input) {
             if (input.id && input.id.endsWith("_display")) {
               const guess = document.getElementById(input.id.replace(/_display$/, "_value"));
               if (guess) return guess;
             }
-            // fallback: next hidden sibling
             const sib = input.nextElementSibling;
-            if (sib && sib.tagName === "INPUT" && sib.type === "hidden") return sib;
-            console.warn("TD init: hidden input not found for", input);
-            return null;
+            return (sib && sib.tagName === "INPUT" && sib.type === "hidden") ? sib : null;
           }
 
-          function initField(input) {
-            if (input.dataset.tdInit === "1") return; // idempotent
-            const hidden = findHidden(input);
+          // ---- init one field ----
+          function initOne(input) {
+            if (input.dataset.tdInit === "1") return;
+            const hidden = hiddenFor(input);
             if (!hidden) return;
 
-            const locale  = input.getAttribute("data-td-locale") || GLOBAL.locale || "is";
-            const hour24  = input.getAttribute("data-td-hourcycle") || GLOBAL.hourCycle || "h23";
+            const locale  = input.getAttribute("data-td-locale")         || GLOBAL.locale        || "is";
+            const hour24  = input.getAttribute("data-td-hourcycle")      || GLOBAL.hourCycle     || "h23";
             const format  = input.getAttribute("data-td-display-format") || GLOBAL.displayFormat || "dd.MM.yyyy HH:mm";
             const seconds = pickBool(input.getAttribute("data-td-seconds"), GLOBAL.seconds ?? false);
             const step    = parseInt(input.getAttribute("data-td-step") ?? (GLOBAL.step ?? 1), 10);
 
-            // 1) Create picker on the VISIBLE input
             const picker = new tempusDominus.TempusDominus(input, {
-              localization: { locale: locale, hourCycle: hour24, format: format },
+              localization: { locale, hourCycle: hour24, format },
               stepping: step,
               display: {
                 sideBySide: true,
-                components: { calendar: true, clock: true, hours: true, minutes: true, seconds: seconds }
+                components: { calendar: true, clock: true, hours: true, minutes: true, seconds }
               }
             });
-            // keep a handle for debugging if needed
-            input._td = picker;
 
-            // 2) Seed from hidden ISO
+            // Seed TD internal state from hidden ISO, but swallow any TD quirks
             if (hidden.value) {
-              const d = new Date(hidden.value);            // local time from ISO without zone
-              if (!Number.isNaN(d.getTime())) {
-                picker.dates.setValue(d);                  // set TD internal value
-                // Force the input to show the formatted text immediately
-                input.value = formatDisplay(d, format);
-              }
+              const js = parseIsoLocal(hidden.value);
+              const td = toTD(js);
+              if (td) { try { picker.dates.setValue(td); } catch {/* ignore */} }
             }
 
-            // 3) Sync hidden ISO on change
+            // Keep hidden ISO in sync on change
             input.addEventListener("change.td", e => {
               const raw = e?.detail?.date;
-              const js  = raw && typeof raw.toDate === "function" ? raw.toDate() : raw;
+              // TD DateTime -> JS Date
+              const js  = raw && typeof raw.toDate === "function" ? raw.toDate()
+                        : raw?.jsDate ? raw.jsDate
+                        : null;
               if (js instanceof Date && !Number.isNaN(js.getTime())) {
-                hidden.value = toLocalIso(js);
+                hidden.value = toIsoLocal(js);
                 hidden.dispatchEvent(new Event("input",  { bubbles: true }));
                 hidden.dispatchEvent(new Event("change", { bubbles: true }));
               }
             });
 
-            // 4) Make the icon/button open the picker
+            // ---- OPEN behavior (simple & robust) ----
+
+            // A) Textbox: open on focus (this previously worked well)
+            input.addEventListener("focus", () => { try { picker.show(); } catch {} });
+
+            // B) Icon button: disable TD's built-in toggle and open ourselves
             if (input.id) {
-              const expected = "#" + input.id;
+              const target = "#" + input.id;
+              document.querySelectorAll(
+                `[data-td-toggle="datetimepicker"][data-td-target="${target}"]`
+              ).forEach(btn => {
+                // remove built-in toggler to avoid open→close flicker
+                btn.removeAttribute("data-td-toggle");
+                btn.removeAttribute("data-td-target");
 
-              // direct buttons with matching target
-              document.querySelectorAll('[data-td-toggle="datetimepicker"]').forEach(btn => {
-                if (btn.getAttribute("data-td-target") === expected) {
-                  btn.addEventListener("click", ev => { ev.preventDefault(); input.focus(); picker.toggle(); });
-                }
-              });
-
-              // also handle clicks inside the same input-group
-              const group = input.closest(".input-group");
-              if (group) {
-                group.addEventListener("click", ev => {
-                  const t = ev.target.closest('[data-td-toggle="datetimepicker"]');
-                  if (t && t.getAttribute("data-td-target") === expected) {
-                    ev.preventDefault();
-                    input.focus();
-                    picker.toggle();
-                  }
+                // keep focus on the textbox
+                btn.addEventListener("mousedown", ev => {
+                  ev.preventDefault();
+                  input.focus();
                 });
-              }
-            }
 
-            // 5) Open on focus (nice UX)
-            input.addEventListener("focus", () => picker.show());
+                // open once, no propagation games
+                btn.addEventListener("click", ev => {
+                  ev.preventDefault();
+                  input.focus();
+                  try { picker.show(); } catch {}
+                });
+              });
+            }
 
             input.dataset.tdInit = "1";
           }
 
+          // ---- init all ----
           function initAll() {
-            document.querySelectorAll(".td-datetime").forEach(initField);
+            document.querySelectorAll(".td-datetime").forEach(initOne);
           }
 
-          if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", initAll);
-          } else {
-            initAll();
-          }
+          if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initAll);
+          else initAll();
+
           window.initAllTempusDominus = initAll;
         })();
     </script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
