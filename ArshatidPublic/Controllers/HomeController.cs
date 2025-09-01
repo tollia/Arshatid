@@ -52,6 +52,12 @@ namespace ArshatidPublic.Controllers
                 .OrderBy(n => n)
                 .ToList();
 
+            var abc = costCenters
+                .Select(c => c.OrgUnitName)
+                .Distinct()
+                .OrderBy(n => n)
+                .ToList()
+
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 ViewBag.NotInvitedMessage = "Þú ert ekki á boðslista Árshátíðar, hafðu samband við arshatid@kopavogur.is ef þetta eru mistök.";
