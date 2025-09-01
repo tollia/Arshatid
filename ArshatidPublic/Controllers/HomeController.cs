@@ -30,6 +30,7 @@ namespace ArshatidPublic.Controllers
         }
 
         [HttpGet]
+        [HttpPost]
         [ManualJwtSignIn]
         public async Task<IActionResult> Skraning(string? jwt)
         {
