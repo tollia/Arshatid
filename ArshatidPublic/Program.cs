@@ -1,7 +1,18 @@
+using System.Net.Http.Headers;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient("ArshatidApi", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ArshatidApi:BaseUrl"]!);
+    var token = builder.Configuration["ArshatidApi:Jwt"];
+    if (!string.IsNullOrWhiteSpace(token))
+    {
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    }
+});
 
 var app = builder.Build();
 

@@ -1,16 +1,21 @@
+using ArshatidModels.Dtos;
 using ArshatidPublic.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Http.Json;
 
 namespace ArshatidPublic.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IHttpClientFactory _clientFactory;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IHttpClientFactory clientFactory)
         {
             _logger = logger;
+            _clientFactory = clientFactory;
         }
 
         public IActionResult Index()
@@ -21,6 +26,55 @@ namespace ArshatidPublic.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Skraning()
+        {
+            var client = _clientFactory.CreateClient("ArshatidApi");
+            var response = await client.GetAsync("registration");
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                ViewBag.NotInvitedMessage = "Þú ert ekki á boðslista Árshátíðar, Hafaðu samband við arshatid@kopavogur.is ef þetta eru mistök.";
+                return View(new RegistrationViewModel());
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return View(new RegistrationViewModel());
+            }
+
+            var registration = await response.Content.ReadFromJsonAsync<RegistrationDto>();
+            var model = new RegistrationViewModel();
+            if (registration != null)
+            {
+                model.Plus = registration.Plus == 1;
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Skraning(RegistrationViewModel model)
+        {
+            var client = _clientFactory.CreateClient("ArshatidApi");
+            var request = new UpsertRegistrationRequest
+            {
+                Plus = model.Plus,
+                Alergies = model.Alergies
+            };
+            await client.PutAsJsonAsync("registration", request);
+            return RedirectToAction(nameof(Skraning));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> KemstEkki()
+        {
+            var client = _clientFactory.CreateClient("ArshatidApi");
+            await client.DeleteAsync("registration");
+            return RedirectToAction(nameof(Skraning));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
