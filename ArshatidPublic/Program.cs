@@ -1,6 +1,14 @@
+using ArshatidPublic.Classes;
 using System.Net.Http.Headers;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<TokenHandler>();
+builder.Services.AddSingleton<ITokenHandlerService, IslandIsTokenHandlerService>();
+builder.Services.AddScoped<ManualJwtSignInFilter>();
+builder.Services.AddTransient<ApiTokenHandler>();
+builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

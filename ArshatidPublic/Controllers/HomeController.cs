@@ -1,4 +1,5 @@
 using ArshatidModels.Dtos;
+using ArshatidPublic.Classes;
 using ArshatidPublic.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -29,14 +30,17 @@ namespace ArshatidPublic.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Skraning()
+        [ManualJwtSignIn]
+        public async Task<IActionResult> Skraning(string? jwt)
         {
-            var client = _clientFactory.CreateClient("ArshatidApi");
-            var response = await client.GetAsync("registration");
+            ViewBag.Name = User.Identity?.Name ?? "Óþekktur aðili";
+
+            HttpClient client = _clientFactory.CreateClient("ArshatidApi");
+            HttpResponseMessage response = await client.GetAsync("registration");
 
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
-                ViewBag.NotInvitedMessage = "Þú ert ekki á boðslista Árshátíðar, Hafaðu samband við arshatid@kopavogur.is ef þetta eru mistök.";
+                ViewBag.NotInvitedMessage = "Þú ert ekki á boðslista Árshátíðar, hafðu samband við arshatid@kopavogur.is ef þetta eru mistök.";
                 return View(new RegistrationViewModel());
             }
 
@@ -56,6 +60,7 @@ namespace ArshatidPublic.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ManualJwtSignIn]
         public async Task<IActionResult> Skraning(RegistrationViewModel model)
         {
             var client = _clientFactory.CreateClient("ArshatidApi");
@@ -70,6 +75,7 @@ namespace ArshatidPublic.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ManualJwtSignIn]
         public async Task<IActionResult> KemstEkki()
         {
             var client = _clientFactory.CreateClient("ArshatidApi");
