@@ -31,6 +31,6 @@ public class ArshatidCostCenter
     [Required]
     public int CostCenterCode { get; set; }
 
-    public virtual ICollection<ArshatidInvitee> Invitees { get; set; } = new List<ArshatidInvitee>();
+    public virtual ICollection<ArshatidRegistration> Registrations { get; set; } = new List<ArshatidRegistration>();
 }
 

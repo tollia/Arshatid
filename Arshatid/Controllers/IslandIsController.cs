@@ -86,10 +86,12 @@ public class IslandIsController : Controller
         }
 
         int plus = request.Plus ? 1 : 0;
-        invitee.ArshatidCostCenterFk = request.ArshatidCostCenterFk;
+        invitee.Phone = _claimsHelper.GetPhone(User);
+        invitee.Email = _claimsHelper.GetEmail(User);
+        invitee.Gender = _claimsHelper.GetGender(User);
         _dbContext.ArshatidInvitees.Update(invitee);
         _dbContext.SaveChanges();
-        ArshatidRegistration registration = _registrationService.Upsert(invitee, plus, request.Alergies ?? string.Empty, request.Vegan);
+        ArshatidRegistration registration = _registrationService.Upsert(invitee, plus, request.Alergies ?? string.Empty, request.Vegan, request.ArshatidCostCenterFk);
         RegistrationDto dto = MapToDto(currentEvent, invitee, registration);
         return Ok(dto);
     }
@@ -137,14 +139,16 @@ public class IslandIsController : Controller
             Plus = registration.Plus,
             Vegan = registration.Vegan,
             Alergies = registration.Alergies,
-            ArshatidCostCenterFk = invitee.ArshatidCostCenterFk,
+            ArshatidCostCenterFk = registration.ArshatidCostCenterFk,
             Invitee = new InviteeDto
             {
                 EventId = invitee.ArshatidFk,
                 InviteeId = invitee.Pk,
-                CostCenterId = invitee.ArshatidCostCenterFk,
                 Ssn = invitee.Ssn,
-                Name = name
+                Name = name,
+                Phone = invitee.Phone,
+                Email = invitee.Email,
+                Gender = invitee.Gender
             }
         };
     }
