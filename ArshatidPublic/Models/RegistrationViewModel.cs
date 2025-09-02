@@ -8,7 +8,7 @@ public class RegistrationViewModel
     public bool Plus { get; set; }
     [Display(Name = "Fæðuóþol")]
     public string? Alergies { get; set; }
-    [Display(Name = "Kostnaðarstaður")]
+    [Display(Name = "Vinnustaður")]
     public int? ArshatidCostCenterFk { get; set; }
     [Display(Name = "Vegan")]
     public bool Vegan { get; set; }
