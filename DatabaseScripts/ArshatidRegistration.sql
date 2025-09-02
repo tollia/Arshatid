@@ -1,6 +1,7 @@
 CREATE  TABLE TolliTest.dbo.ArshatidRegistration ( 
 	Pk                   int    IDENTITY ( 1 , 1 )  NOT NULL,
 	Plus                 int  DEFAULT 0    NOT NULL,
+
 	Alergies             nvarchar(255)      NULL,
 	ArshatidInviteeFk    int      NOT NULL,
 	Vegan                bit  DEFAULT 0    NOT NULL,
