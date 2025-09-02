@@ -4,10 +4,11 @@ CREATE  TABLE TolliTest.dbo.ArshatidRegistration (
 	Alergies             nvarchar(255)      NULL,
 	ArshatidInviteeFk    int      NOT NULL,
 	Vegan                bit  DEFAULT 0    NOT NULL,
+	ArshatidCostCenterFk int      NOT NULL,
 	CONSTRAINT pk_ArshatidRegistrations PRIMARY KEY  ( Pk ) ,
 	CONSTRAINT unq_ArshatidRegistration_Invitee UNIQUE ( ArshatidInviteeFk ) 
  );
 
 ALTER TABLE TolliTest.dbo.ArshatidRegistration ADD CONSTRAINT fk_arshatidregistration FOREIGN KEY ( ArshatidInviteeFk ) REFERENCES TolliTest.dbo.ArshatidInvitee( pk );
-GO
 
+ALTER TABLE TolliTest.dbo.ArshatidRegistration ADD CONSTRAINT fk_arshatidregistration_costcenter FOREIGN KEY ( ArshatidCostCenterFk ) REFERENCES TolliTest.dbo.ArshatidCostCenter( Pk );
