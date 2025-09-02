@@ -136,6 +136,7 @@ public class IslandIsController : Controller
             RegistrationId = registration.Pk,
             Plus = registration.Plus,
             Vegan = registration.Vegan,
+            Alergies = registration.Alergies,
             ArshatidCostCenterFk = invitee.ArshatidCostCenterFk,
             Invitee = new InviteeDto
             {
