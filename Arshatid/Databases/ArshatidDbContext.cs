@@ -36,17 +36,17 @@ namespace Arshatid.Databases
                 .HasForeignKey(i => i.ArshatidFk)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ArshatidInvitee>()
-                .HasOne(i => i.CostCenter)
-                .WithMany(c => c.Invitees)
-                .HasForeignKey(i => i.ArshatidCostCenterFk);
-
             // ArshatidInvitee (principal) 1* ArshatidRegistration (dependent)
             modelBuilder.Entity<ArshatidRegistration>()
                 .HasOne(r => r.Invitee)
                 .WithMany(i => i.Registrations)
                 .HasForeignKey(r => r.ArshatidInviteeFk)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ArshatidRegistration>()
+                .HasOne(r => r.CostCenter)
+                .WithMany(c => c.Registrations)
+                .HasForeignKey(r => r.ArshatidCostCenterFk);
 
             // Uniqueness you wanted
             modelBuilder.Entity<ArshatidInvitee>()

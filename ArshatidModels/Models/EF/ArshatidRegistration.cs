@@ -19,9 +19,14 @@ public class ArshatidRegistration
 
     public bool Vegan { get; set; } = false;
 
+    public int? ArshatidCostCenterFk { get; set; }
+
     [Required]
     public int ArshatidInviteeFk { get; set; }
 
     [ForeignKey(nameof(ArshatidInviteeFk))]
     public virtual ArshatidInvitee Invitee { get; set; } = null!;
+
+    [ForeignKey(nameof(ArshatidCostCenterFk))]
+    public virtual ArshatidCostCenter? CostCenter { get; set; }
 }

@@ -22,7 +22,8 @@ public class RegistrationService
         ArshatidInvitee invitee,
         int plus,
         string alergies,
-        bool vegan
+        bool vegan,
+        int? costCenterFk
     )
     {
         ArshatidRegistration? registration = GetByInvitee(invitee);
@@ -38,7 +39,8 @@ public class RegistrationService
                 ArshatidInviteeFk = invitee.Pk,
                 Plus = plus,
                 Alergies = alergies,
-                Vegan = vegan
+                Vegan = vegan,
+                ArshatidCostCenterFk = costCenterFk
             };
             _dbContext.ArshatidRegistrations.Add(registration);
         }
@@ -47,6 +49,7 @@ public class RegistrationService
             registration.Plus = plus;
             registration.Alergies = alergies;
             registration.Vegan = vegan;
+            registration.ArshatidCostCenterFk = costCenterFk;
             _dbContext.ArshatidRegistrations.Update(registration);
         }
 
