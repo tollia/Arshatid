@@ -10,6 +10,7 @@ namespace ArshatidPublic.Classes
     {
         private readonly ITokenHandlerService _tokenHandler;
         private readonly ITempDataDictionaryFactory _tempDataFactory;
+        private readonly ILogger<ManualJwtSignInFilter> _logger;
 
         // Run very early
         public int Order => int.MinValue + 100;
@@ -20,10 +21,13 @@ namespace ArshatidPublic.Classes
 
         public ManualJwtSignInFilter(
             ITokenHandlerService tokenHandler,
-            ITempDataDictionaryFactory tempDataFactory)
+            ITempDataDictionaryFactory tempDataFactory,
+            ILogger<ManualJwtSignInFilter> logger
+        )
         {
             _tokenHandler = tokenHandler;
             _tempDataFactory = tempDataFactory;
+            _logger = logger;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -86,9 +90,11 @@ namespace ArshatidPublic.Classes
                 return;
             }
 
+            _logger.LogInformation("Found jwt={jwt}", jwt);
             ClaimsPrincipal? principal = await _tokenHandler.ValidateTokenAsync(jwt);
             if (principal?.Identity?.IsAuthenticated != true)
             {
+                _logger.LogInformation("Jwt token failed validation");
                 context.Result = new UnauthorizedResult();
                 return;
             }

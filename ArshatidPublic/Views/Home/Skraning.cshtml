@@ -38,7 +38,7 @@
                     <select class="form-select js-choices"
                             asp-for="ArshatidCostCenterFk"
                             asp-items="@(ViewBag.CostCenters as IEnumerable<SelectListItem>)"
-                            data-placeholder="Veldu kostnaðarstað">
+                            data-placeholder="Veldu vinnustaðstað">
                         <option value="">Veldu kostnaðarstað</option>
                     </select>
                     <span class="text-danger" asp-validation-for="ArshatidCostCenterFk"></span>

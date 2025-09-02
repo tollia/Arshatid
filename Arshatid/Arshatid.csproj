@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="ExcelMapper" Version="6.0.612" />
-    <PackageReference Include="GraphAuthentication" Version="2.2.0" />
+    <PackageReference Include="GraphAuthentication" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />

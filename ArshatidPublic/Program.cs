@@ -3,6 +3,11 @@ using System.Net.Http.Headers;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddDebug();     // VS Output window in debug
+builder.Logging.AddConsole();   // console (dotnet run, container logs)
+builder.Logging.AddEventLog();  // Windows Event Viewer under IIS
+builder.Logging.AddEventSourceLogger();
+
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<TokenHandler>();
 builder.Services.AddSingleton<ITokenHandlerService, IslandIsTokenHandlerService>();
