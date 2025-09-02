@@ -19,8 +19,10 @@ public class Person
     public string? Address { get; set; }
 
     [StringLength(10)]
+    [Column("postcode")]
     public string? Postalcode { get; set; }
 
     [StringLength(255)]
+    [Column("province")]
     public string? Municipality { get; set; }
 }

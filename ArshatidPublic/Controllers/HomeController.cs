@@ -73,6 +73,7 @@ namespace ArshatidPublic.Controllers
             {
                 model.Plus = registration.Plus == 1;
                 model.Vegan = registration.Vegan;
+                model.Alergies = registration.Alergies;
                 model.ArshatidCostCenterFk = registration.ArshatidCostCenterFk;
             }
             model.JwtToken = HttpContext.Items["jwt_token"].ToString();
@@ -80,7 +81,8 @@ namespace ArshatidPublic.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
+        //[ValidateAntiForgeryToken]
         [ManualJwtSignIn]
         public async Task<IActionResult> SkraningUpsert([FromForm] string jwt, RegistrationViewModel model)
         {
@@ -94,20 +96,33 @@ namespace ArshatidPublic.Controllers
                 JwtToken = model.JwtToken
             };
             await client.PutAsJsonAsync("registration", request);
-            return RedirectToAction(
-                nameof(Skraning),
-                new { jwt = model.JwtToken }
-            );
+            //return RedirectToAction(
+            //    nameof(Skraning),
+            //    new { jwt = model.JwtToken }
+            //);
+            return RedirectToAction(nameof(Super));
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         [ManualJwtSignIn]
         public async Task<IActionResult> KemstEkki(string jwt)
         {
             var client = _clientFactory.CreateClient("ArshatidApi");
             await client.DeleteAsync("registration");
-            return RedirectToAction(nameof(Skraning));
+            return RedirectToAction(nameof(Sorry));
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> Super()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> Sorry()
+        {
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

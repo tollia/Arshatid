@@ -20,7 +20,6 @@
     <div b-191jc0ugh8="" class="container" style="max-width: 1000px;">
         <main b-191jc0ugh8="" role="main" class="pb-3">
             <form asp-controller="Home" asp-action="SkraningUpsert" method="post" class="row g-3">
-                @Html.AntiForgeryToken()
                 <input type="hidden" name="jwt" value="@(Context.Items["jwt_token"] as string)" />
 
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
