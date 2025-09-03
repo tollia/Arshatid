@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 
 namespace ArshatidPublic.Controllers
 {
@@ -15,11 +17,15 @@ namespace ArshatidPublic.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly IMemoryCache _cache;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger, IHttpClientFactory clientFactory)
+        public HomeController(ILogger<HomeController> logger, IHttpClientFactory clientFactory, IMemoryCache cache, IConfiguration configuration)
         {
             _logger = logger;
             _clientFactory = clientFactory;
+            _cache = cache;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -124,6 +130,37 @@ namespace ArshatidPublic.Controllers
         {
             return View();
         }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> Image(string imageName)
+        {
+            if (string.IsNullOrEmpty(imageName))
+            {
+                return NotFound();
+            }
+
+            var cacheKey = $"image_{imageName}";
+            if (!_cache.TryGetValue(cacheKey, out CachedImage cached))
+            {
+                var client = _clientFactory.CreateClient("ArshatidApi");
+                var eventId = _configuration.GetValue<int>("ArshatidApi:EventId");
+                var response = await client.GetAsync($"events/{eventId}/images/{imageName}");
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var data = await response.Content.ReadAsByteArrayAsync();
+                var contentType = response.Content.Headers.ContentType?.ToString() ?? "image/jpeg";
+                cached = new CachedImage(data, contentType);
+                var minutes = _configuration.GetValue<int>("ImageCacheMinutes", 60);
+                _cache.Set(cacheKey, cached, TimeSpan.FromMinutes(minutes));
+            }
+
+            return File(cached.Data, cached.ContentType);
+        }
+
+        private record CachedImage(byte[] Data, string ContentType);
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

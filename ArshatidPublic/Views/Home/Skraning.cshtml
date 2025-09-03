@@ -5,7 +5,7 @@
 }
 
 <p>
-    <img src="~/img/CoverPhoto.jpg" class="img-fluid" alt="Event Cover Photo">
+    <img src="@Url.Action("Image", "Home", new { imageName = "Banner" })" class="img-fluid" alt="Event Cover Photo">
 </p>
 
 @* Show warning if user is not invited *@
