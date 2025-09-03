@@ -128,6 +128,27 @@ public class IslandIsController : Controller
         return Ok(centers);
     }
 
+    [AllowAnonymous]
+    [HttpGet("events/{eventId}/images/{imageName}")]
+    public IActionResult GetImage(int eventId, string imageName)
+    {
+        var type = _dbContext.ArshatidImageTypes
+            .FirstOrDefault(t => t.Name == imageName);
+        if (type == null)
+        {
+            return NotFound();
+        }
+
+        ArshatidImage? image = _dbContext.ArshatidImages
+            .FirstOrDefault(i => i.ArshatidFk == eventId && i.ImageTypeFk == type.Pk);
+        if (image == null)
+        {
+            return NotFound();
+        }
+
+        return File(image.ImageData, image.ContentType);
+    }
+
     private RegistrationDto MapToDto(ArshatidModels.Models.EF.Arshatid currentEvent, ArshatidInvitee invitee, ArshatidRegistration registration)
     {
         string name = _generalDbContext.Person
