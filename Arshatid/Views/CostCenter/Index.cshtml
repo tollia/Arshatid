@@ -1,0 +1,111 @@
+@model List<ArshatidModels.Models.EF.ArshatidCostCenter>
+@{
+    ViewData["Title"] = "Cost Centers";
+}
+<h1>Cost Centers</h1>
+<table class="table" id="ccTable">
+    <thead>
+        <tr>
+            <th>Corporation</th>
+            <th>Org Unit Id</th>
+            <th>Org Unit Name</th>
+            <th>Is Division</th>
+            <th>Cost Center Name</th>
+            <th>Cost Center Code</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var cc in Model)
+{
+    <tr data-id="@cc.Pk">
+        <td><input class="form-control" data-field="Corporation" value="@cc.Corporation" /></td>
+        <td><input class="form-control" data-field="OrgUnitId" type="number" value="@cc.OrgUnitId" /></td>
+        <td><input class="form-control" data-field="OrgUnitName" value="@cc.OrgUnitName" /></td>
+        <td class="text-center"><input class="form-check-input" data-field="IsDivision" type="checkbox" @(cc.IsDivision ? "checked" : "") /></td>
+        <td><input class="form-control" data-field="CostCenterName" value="@cc.CostCenterName" /></td>
+        <td><input class="form-control" data-field="CostCenterCode" type="number" value="@cc.CostCenterCode" /></td>
+    </tr>
+}
+        <tr class="new unsaved">
+            <td><input class="form-control" data-field="Corporation" /></td>
+            <td><input class="form-control" data-field="OrgUnitId" type="number" /></td>
+            <td><input class="form-control" data-field="OrgUnitName" /></td>
+            <td class="text-center"><input class="form-check-input" data-field="IsDivision" type="checkbox" /></td>
+            <td><input class="form-control" data-field="CostCenterName" /></td>
+            <td><input class="form-control" data-field="CostCenterCode" type="number" /></td>
+        </tr>
+    </tbody>
+</table>
+<style>
+    .unsaved { background-color: #ffe0e0; }
+</style>
+<script>
+    $(function () {
+        function getRowData(row) {
+            return {
+                Pk: row.data('id') || 0,
+                Corporation: row.find('[data-field="Corporation"]').val(),
+                OrgUnitId: parseInt(row.find('[data-field="OrgUnitId"]').val()),
+                OrgUnitName: row.find('[data-field="OrgUnitName"]').val(),
+                IsDivision: row.find('[data-field="IsDivision"]').is(':checked'),
+                CostCenterName: row.find('[data-field="CostCenterName"]').val(),
+                CostCenterCode: parseInt(row.find('[data-field="CostCenterCode"]').val())
+            };
+        }
+
+        function sendUpdate(row) {
+            var data = getRowData(row);
+            row.addClass('unsaved');
+            $.ajax({
+                url: '/CostCenter/Update',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data)
+            }).done(function () {
+                row.removeClass('unsaved');
+            });
+        }
+
+        function attachRowHandlers(row) {
+            row.find('input').on('change', function () {
+                sendUpdate(row);
+            });
+        }
+
+        $('#ccTable tbody tr').not('.new').each(function () {
+            attachRowHandlers($(this));
+        });
+
+        function checkNewRow() {
+            var row = $('#ccTable tbody tr.new');
+            var data = getRowData(row);
+            if (!data.Corporation || isNaN(data.OrgUnitId) || !data.OrgUnitName ||
+                !data.CostCenterName || isNaN(data.CostCenterCode)) {
+                return;
+            }
+            row.addClass('unsaved');
+            $.ajax({
+                url: '/CostCenter/Create',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data)
+            }).done(function (res) {
+                var id = res.id;
+                row.removeClass('unsaved new').attr('data-id', id);
+                attachRowHandlers(row);
+                var newRow = $('<tr class="new unsaved">' +
+                    '<td><input class="form-control" data-field="Corporation" /></td>' +
+                    '<td><input class="form-control" data-field="OrgUnitId" type="number" /></td>' +
+                    '<td><input class="form-control" data-field="OrgUnitName" /></td>' +
+                    '<td class="text-center"><input class="form-check-input" data-field="IsDivision" type="checkbox" /></td>' +
+                    '<td><input class="form-control" data-field="CostCenterName" /></td>' +
+                    '<td><input class="form-control" data-field="CostCenterCode" type="number" /></td>' +
+                    '</tr>');
+                $('#ccTable tbody').append(newRow);
+                newRow.find('input').on('change', checkNewRow);
+            });
+        }
+
+        $('#ccTable tbody tr.new input').on('change', checkNewRow);
+    });
+</script>
