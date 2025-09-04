@@ -139,11 +139,11 @@ namespace ArshatidPublic.Controllers
                 return NotFound();
             }
 
-            var cacheKey = $"image_{imageName}";
+            HttpClient? client = _clientFactory.CreateClient("ArshatidApi");
+            int eventId = _configuration.GetValue<int>("ArshatidApi:EventId");
+            string cacheKey = $"image_{imageName}";
             if (!_cache.TryGetValue(cacheKey, out CachedImage cached))
             {
-                var client = _clientFactory.CreateClient("ArshatidApi");
-                var eventId = _configuration.GetValue<int>("ArshatidApi:EventId");
                 var response = await client.GetAsync($"events/{eventId}/images/{imageName}");
                 if (!response.IsSuccessStatusCode)
                 {

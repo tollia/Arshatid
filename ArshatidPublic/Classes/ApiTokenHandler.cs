@@ -1,35 +1,39 @@
-﻿using System.Net.Http.Headers;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Net.Http.Headers;
 
 namespace ArshatidPublic.Classes
 {
     public class ApiTokenHandler : DelegatingHandler
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<ApiTokenHandler> _logger;
 
-        public ApiTokenHandler(IHttpContextAccessor accessor)
+        public ApiTokenHandler(IHttpContextAccessor accessor, ILogger<ApiTokenHandler> logger)
         {
             _httpContextAccessor = accessor;
+            _logger = logger;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
-            CancellationToken cancellationToken
-        )
+            CancellationToken cancellationToken)
         {
-            var context = _httpContextAccessor.HttpContext;
+            HttpContext? context = _httpContextAccessor.HttpContext;
 
-            // Get the token directly from the Items collection.
-            var tokenToUse = context?.Items["jwt_token"] as string;
+            // Is the current MVC/Razor/Minimal endpoint marked [AllowAnonymous]?
+            bool allowsAnonymous =
+                context?.GetEndpoint()?.Metadata.GetMetadata<IAllowAnonymous>() is not null;
 
-            if (string.IsNullOrWhiteSpace(tokenToUse))
+            // If we have a token, attach it regardless (useful for anonymous pages where a token is present).
+            string? token = context?.Items["jwt_token"] as string;
+            if (!string.IsNullOrWhiteSpace(token))
             {
-                // This exception is now correct, as it's the only place we look.
-                throw new InvalidOperationException(
-                    "No authentication token found in HttpContext.Items.");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
-
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", tokenToUse);
+            else if (!allowsAnonymous)
+            {
+                throw new InvalidOperationException("No authentication token found in HttpContext.Items.");
+            }
 
             return await base.SendAsync(request, cancellationToken);
         }

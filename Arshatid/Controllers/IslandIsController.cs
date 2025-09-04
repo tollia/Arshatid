@@ -139,8 +139,9 @@ public class IslandIsController : Controller
             return NotFound();
         }
 
+
         ArshatidImage? image = _dbContext.ArshatidImages
-            .FirstOrDefault(i => i.ArshatidFk == eventId && i.ImageTypeFk == type.Pk);
+            .FirstOrDefault((ArshatidImage i) => i.Pk == type.Pk && i.ArshatidFk == eventId);
         if (image == null)
         {
             return NotFound();

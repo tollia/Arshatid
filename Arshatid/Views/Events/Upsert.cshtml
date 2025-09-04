@@ -13,7 +13,11 @@
     method="post"
 >
     <input type="hidden" asp-for="Pk" />
-    <td-datetime asp-for="EventTime"></td-datetime>
+    <div class="mb-3">
+        <label asp-for="EventTime" class="form-label"></label>
+        <input asp-for="EventTime" class="form-control datepicker"></input>
+        <span asp-validation-for="EventTime" class="text-danger"></span>
+    </div>
     <div class="mb-3">
         <label asp-for="Heading" class="form-label"></label>
         <input asp-for="Heading" class="form-control" />
@@ -74,5 +78,6 @@
     </div>
 }
 @section Scripts {
+    <script src="~/js/datePicker.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
