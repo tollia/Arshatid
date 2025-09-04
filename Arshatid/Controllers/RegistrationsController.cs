@@ -3,7 +3,9 @@ using ArshatidModels.Models.EF;
 using Ganss.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Arshatid.Controllers;
@@ -51,46 +53,70 @@ public class RegistrationsController : Controller
     [HttpGet("export")]
     public IActionResult Export(int eventId, string format)
     {
-        List<ArshatidRegistration> registrations = _dbContext.ArshatidRegistrations
-            .Where((ArshatidRegistration r) => r.Invitee.ArshatidFk == eventId)
+        var registrations = _dbContext.ArshatidRegistrations
+            .Include(r => r.Invitee)
+            .Include(r => r.CostCenter)
+            .Where(r => r.Invitee.ArshatidFk == eventId)
             .ToList();
-        List<RegistrationExport> rows = new List<RegistrationExport>();
-        foreach (ArshatidRegistration reg in registrations)
+
+        var rows = registrations.Select(reg => new RegistrationExport
         {
-            string name = _generalDbContext.Person
-                .FirstOrDefault((Person p) => p.Ssn == reg.Invitee.Ssn)?.Name ?? reg.Invitee.Ssn;
-            RegistrationExport row = new RegistrationExport
-            {
-                Ssn = reg.Invitee.Ssn,
-                Name = name,
-                Plus = reg.Plus,
-                EventId = reg.Invitee.ArshatidFk
-            };
-            rows.Add(row);
-        }
+            Ssn = reg.Invitee.Ssn,
+            FullName = reg.Invitee.FullName,
+            Plus = reg.Plus,
+            Alergies = reg.Alergies,
+            Vegan = reg.Vegan,
+            Phone = reg.Invitee.Phone,
+            Email = reg.Invitee.Email,
+            Gender = reg.Invitee.Gender,
+            OrgUnitName = reg.CostCenter?.OrgUnitName,
+            CostCenterName = reg.CostCenter?.CostCenterName,
+            CostCenterCode = reg.CostCenter?.CostCenterCode
+        }).ToList();
+
         if (format == "xlsx")
         {
-            ExcelMapper mapper = new ExcelMapper();
-            MemoryStream stream = new MemoryStream();
+            var mapper = new ExcelMapper();
+            var stream = new MemoryStream();
             mapper.Save(stream, rows, "Registrations");
             stream.Position = 0;
             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "registrations.xlsx");
         }
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("Ssn,Name,Plus,EventId");
-        foreach (RegistrationExport row in rows)
+
+        var sb = new StringBuilder();
+        sb.AppendLine("Kennitala,Nafn,Gestur,Fæðuóþol,Vegan,Sími,Tölvupóstur,Kyn,Skipulagseining,Vinnustaður,Kostnaðarlykill");
+        foreach (var row in rows)
         {
-            sb.AppendLine($"{row.Ssn},{row.Name},{row.Plus},{row.EventId}");
+            sb.AppendLine($"{row.Ssn},{row.FullName},{row.Plus},{row.Alergies},{row.Vegan},{row.Phone},{row.Email},{row.Gender},{row.OrgUnitName},{row.CostCenterName},{row.CostCenterCode}");
         }
+
         byte[] bytes = Encoding.UTF8.GetBytes(sb.ToString());
         return File(bytes, "text/csv", "registrations.csv");
     }
 
     private class RegistrationExport
     {
+        [Display(Name = "Kennitala")]
         public string Ssn { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
+        [Display(Name = "Nafn")]
+        public string FullName { get; set; } = string.Empty;
+        [Display(Name = "Gestur")]
         public int Plus { get; set; }
-        public int EventId { get; set; }
+        [Display(Name = "Fæðuóþol")]
+        public string? Alergies { get; set; }
+        [Display(Name = "Vegan")]
+        public bool Vegan { get; set; }
+        [Display(Name = "Sími")]
+        public string? Phone { get; set; }
+        [Display(Name = "Tölvupóstur")]
+        public string? Email { get; set; }
+        [Display(Name = "Kyn")]
+        public string? Gender { get; set; }
+        [Display(Name = "Skipulagseining")]
+        public string? OrgUnitName { get; set; }
+        [Display(Name = "Vinnustaður")]
+        public string? CostCenterName { get; set; }
+        [Display(Name = "Kostnaðarlykill")]
+        public int? CostCenterCode { get; set; }
     }
 }
