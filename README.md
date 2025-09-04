@@ -30,11 +30,24 @@ The only object mapped to GeneralDbContext is the Person entity. Add the below t
     public class Person
     {
         [Key]
-        public string Ssn { get; set; }
-        public string Name { get; set; }
-        public string Address { get; set; }
-        public string Postalcode { get; set; }
-        public string Municipality { get; set; }
+        [Column("Ssn")]
+        [StringLength(10)]
+        public string Ssn { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(255)]
+        public string Name { get; set; } = string.Empty;
+
+        [StringLength(255)]
+        public string? Address { get; set; }
+
+        [StringLength(10)]
+        [Column("postcode")]
+        public string? Postalcode { get; set; }
+
+        [StringLength(255)]
+        [Column("province")]
+        public string? Municipality { get; set; }
     }
 Take care to use all the EntityFramework attributes to ensure the model matches the database table exactly and follows best practices.
 Add all Natigation properties as virtual.
