@@ -35,22 +35,12 @@
     </div>
     <div class="mb-3">
         <label asp-for="RegistrationStartTime" class="form-label"></label>
-        <input asp-for="RegistrationStartTime"
-               type="datetime-local"
-               asp-format="{0:yyyy-MM-ddTHH:mm}"
-               class="form-control"
-               lang="is"
-        />
+        <input asp-for="RegistrationStartTime" class="form-control datepicker"/>
         <span asp-validation-for="RegistrationStartTime" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="RegistrationEndTime" class="form-label"></label>
-        <input asp-for="RegistrationEndTime"
-               type="datetime-local"
-               asp-format="{0:yyyy-MM-ddTHH:mm}"
-               class="form-control"
-               lang="is"
-        />
+        <input asp-for="RegistrationEndTime" class="form-control datepicker"/>
         <span asp-validation-for="RegistrationEndTime" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary">Vista</button>
