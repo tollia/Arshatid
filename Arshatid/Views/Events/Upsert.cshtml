@@ -43,12 +43,13 @@
         <input asp-for="RegistrationEndTime" class="form-control datepicker"/>
         <span asp-validation-for="RegistrationEndTime" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Vista</button>
+    <button type="submit" class="btn btn-primary" title="Vista"><i class="bi bi-floppy-fill"></i></button>
     <a class="btn btn-secondary"
        asp-controller="Events"
        asp-action="Index"
-       asp-route-hidePast="@(hidePast ? "true" : "false")">
-        Til baka
+       asp-route-hidePast="@(hidePast ? "true" : "false")"
+       title="Til baka">
+        <i class="bi bi-arrow-left-circle-fill"></i>
     </a>
 </form>
 @if (isEdit)
@@ -56,15 +57,15 @@
     <hr />
     <div class="mb-3">
         <h3>Myndir</h3>
-        <a class="btn btn-outline-secondary" asp-controller="Images" asp-action="Index" asp-route-eventId="@Model.Pk">Myndir</a>
+        <a class="btn btn-outline-secondary" asp-controller="Images" asp-action="Index" asp-route-eventId="@Model.Pk" title="Myndir"><i class="bi bi-images"></i></a>
     </div>
     <div class="mb-3">
         <h3>Boðsgestir</h3>
-        <a class="btn btn-outline-secondary" asp-controller="Invitees" asp-action="Index" asp-route-eventId="@Model.Pk">Boðsgestir</a>
+        <a class="btn btn-outline-secondary" asp-controller="Invitees" asp-action="Index" asp-route-eventId="@Model.Pk" title="Boðsgestir"><i class="bi bi-people-fill"></i></a>
     </div>
     <div class="mb-3">
         <h3>Skráningar</h3>
-        <a class="btn btn-outline-secondary" asp-controller="Registrations" asp-action="Index" asp-route-eventId="@Model.Pk">Skráningar</a>
+        <a class="btn btn-outline-secondary" asp-controller="Registrations" asp-action="Index" asp-route-eventId="@Model.Pk" title="Skráningar"><i class="bi bi-card-list"></i></a>
     </div>
 }
 @section Scripts {

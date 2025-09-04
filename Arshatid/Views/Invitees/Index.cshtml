@@ -10,13 +10,13 @@
         <label class="form-label" for="appendFile">Bæta við boðsgestum</label>
         <input class="form-control" type="file" id="appendFile" name="file" />
     </div>
-    <button type="submit" class="btn btn-primary">Bæta við boðsgestum</button>
+    <button type="submit" class="btn btn-primary" title="Bæta við boðsgestum"><i class="bi bi-plus-lg"></i></button>
 </form>
 <form method="post" asp-action="Replace" asp-route-eventId="@evnt.Pk" enctype="multipart/form-data" class="mt-3">
     <div class="mb-3">
         <label class="form-label" for="replaceFile">Hlaða upp nýjum lista</label>
         <input class="form-control" type="file" id="replaceFile" name="file" />
     </div>
-    <button type="submit" class="btn btn-warning">Hlaða upp nýjum lista</button>
+    <button type="submit" class="btn btn-warning" title="Hlaða upp nýjum lista"><i class="bi bi-upload"></i></button>
 </form>
-<a class="btn btn-secondary mt-3" asp-controller="Events" asp-action="Upsert" asp-route-id="@evnt.Pk">Til baka</a>
+<a class="btn btn-secondary mt-3" asp-controller="Events" asp-action="Upsert" asp-route-id="@evnt.Pk" title="Til baka"><i class="bi bi-arrow-left-circle-fill"></i></a>
