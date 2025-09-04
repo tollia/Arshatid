@@ -31,8 +31,8 @@
             <td>@evt.RegistrationEndTime</td>
             <td>
                 <a asp-action="Upsert" asp-route-id="@evt.Pk" asp-route-hidePast="@(hidePast ? "true" : "false")" title="Breyta"><i class="bi bi-pencil-fill"></i></a>
-                <a asp-action="Index" asp-controller="Registrations" asp-route-eventid="@evt.Pk" title="Skráningar"><i class="bi bi-card-list"></i></a>
-                <a asp-action="Index" asp-controller="Invitees" asp-route-eventid="@evt.Pk" title="Boðslisti"><i class="bi bi-people-fill"></i></a>
+                <a asp-action="Index" asp-controller="Registrations" asp-route-eventid="@evt.Pk" title="Skráningar"><i class="bi bi-card-list ms-md-2"></i></a>
+                <a asp-action="Index" asp-controller="Invitees" asp-route-eventid="@evt.Pk" title="Boðslisti"><i class="bi bi-people-fill ms-md-2"></i></a>
             </td>
         </tr>
     }
