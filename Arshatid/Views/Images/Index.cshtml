@@ -19,9 +19,9 @@
         <tr>
             <td>@image.ImageType.Name</td>
             <td>
-                <a href="/Events/@eventId/Images/@image.Pk" target="_blank">Skoða</a>
+                <a href="/Events/@eventId/Images/@image.Pk" target="_blank" title="Skoða"><i class="bi bi-eye-fill"></i></a>
                 |
-                <a href="#" class="delete-image" data-id="@image.Pk">Eyða</a>
+                <a href="#" class="delete-image" data-id="@image.Pk" title="Eyða"><i class="bi bi-trash-fill"></i></a>
             </td>
         </tr>
     }
@@ -35,9 +35,11 @@
     <div class="mb-3">
         <input type="file" name="files" multiple class="form-control" />
     </div>
-    <button type="submit" class="btn btn-primary">Bæta við myndum</button>
+    <div class="d-flex justify-content-between">
+        <a class="btn btn-secondary" asp-controller="Events" asp-action="Upsert" asp-route-id="@eventId" title="Til baka"><i class="bi bi-arrow-left-circle-fill"></i></a>
+        <button type="submit" class="btn btn-primary" title="Bæta við myndum"><i class="bi bi-upload"></i></button>
+    </div>
 </form>
-<a class="btn btn-secondary mt-3" asp-controller="Events" asp-action="Upsert" asp-route-id="@eventId">Til baka</a>
 @section Scripts {
 <script>
     document.querySelectorAll('.delete-image').forEach(function(btn) {
