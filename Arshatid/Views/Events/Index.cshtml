@@ -30,12 +30,12 @@
             <td>@evt.RegistrationStartTime</td>
             <td>@evt.RegistrationEndTime</td>
             <td>
-                    <a asp-action="Upsert" asp-route-id="@evt.Pk" asp-route-hidePast="@(hidePast ? "true" : "false")">Breyta</a>
-                    <a asp-action="Index" asp-controller="Registrations" asp-route-eventid="@evt.Pk">Skráningar</a>
-                    <a asp-action="Index" asp-controller="Invitees" asp-route-eventid="@evt.Pk">Boðslisti</a>
+                <a asp-action="Upsert" asp-route-id="@evt.Pk" asp-route-hidePast="@(hidePast ? "true" : "false")" title="Breyta"><i class="bi bi-pencil-fill"></i></a>
+                <a asp-action="Index" asp-controller="Registrations" asp-route-eventid="@evt.Pk" title="Skráningar"><i class="bi bi-card-list"></i></a>
+                <a asp-action="Index" asp-controller="Invitees" asp-route-eventid="@evt.Pk" title="Boðslisti"><i class="bi bi-people-fill"></i></a>
             </td>
         </tr>
     }
     </tbody>
 </table>
-<a class="btn btn-primary" asp-action="Upsert" asp-route-hidePast="@(hidePast ? "true" : "false")">Nýr viðburður</a>
+<a class="btn btn-primary" asp-action="Upsert" asp-route-hidePast="@(hidePast ? "true" : "false")" title="Nýr viðburður"><i class="bi bi-plus-lg"></i></a>

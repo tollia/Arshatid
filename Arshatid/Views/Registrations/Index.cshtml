@@ -11,8 +11,8 @@
 <div class="d-flex justify-content-between">
     <div>Boðsgestir: @inviteeCount | Plús: @plusCount | Samtals skráningar: @(inviteeCount + plusCount)</div>
     <div>
-        <a class="btn btn-primary me-2" href="/Registrations/export?eventId=@eventId&format=csv">Sækja skráningar CSV</a>
-        <a class="btn btn-secondary" href="/Registrations/export?eventId=@eventId&format=xlsx">Sækja skráningar XLSX</a>
+        <a class="btn btn-primary me-2" href="/Registrations/export?eventId=@eventId&format=csv" title="Sækja skráningar CSV"><i class="bi bi-download"></i> CSV</a>
+        <a class="btn btn-secondary" href="/Registrations/export?eventId=@eventId&format=xlsx" title="Sækja skráningar XLSX"><i class="bi bi-download"></i> XLSX</a>
     </div>
 </div>
 <div class="mt-3">
@@ -25,4 +25,4 @@
     </div>
 }
 </div>
-<a class="btn btn-secondary mt-3" asp-controller="Events" asp-action="Upsert" asp-route-id="@eventId">Til baka</a>
+<a class="btn btn-secondary mt-3" asp-controller="Events" asp-action="Upsert" asp-route-id="@eventId" title="Til baka"><i class="bi bi-arrow-left-circle-fill"></i></a>
