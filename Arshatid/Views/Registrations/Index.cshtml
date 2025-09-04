@@ -1,15 +1,15 @@
 @{
-    string eventIdQuery = Context.Request.Query["eventId"];
-    int eventId = int.TryParse(eventIdQuery, out var parsedEventId) ? parsedEventId : 0;
+    int eventId = (int)ViewBag.EventId;
     ViewData["Title"] = "Skráningar";
     ArshatidModels.Models.EF.Arshatid evnt = (ArshatidModels.Models.EF.Arshatid)ViewBag.Event;
     Dictionary<DateTime, int> histogram = (Dictionary<DateTime, int>)ViewBag.Histogram;
     int inviteeCount = (int)ViewBag.InviteeCount;
+    int registeredCount = (int)ViewBag.RegisteredCount;
     int plusCount = (int)ViewBag.PlusCount;
 }
 <h1>Skráningar</h1>
 <div class="d-flex justify-content-between">
-    <div>Boðsgestir: @inviteeCount | Plús: @plusCount | Samtals skráningar: @(inviteeCount + plusCount)</div>
+    <div>Boðsgestir: @inviteeCount | Plús: @plusCount | Samtals skráningar: @(registeredCount + plusCount)</div>
     <div>
         <a class="btn btn-primary me-2" href="/Registrations/export?eventId=@eventId&format=csv" title="Sækja skráningar CSV"><i class="bi bi-download"></i> CSV</a>
         <a class="btn btn-secondary" href="/Registrations/export?eventId=@eventId&format=xlsx" title="Sækja skráningar XLSX"><i class="bi bi-download"></i> XLSX</a>

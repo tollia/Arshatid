@@ -31,7 +31,9 @@ public class RegistrationsController : Controller
         List<ArshatidRegistration> registrations = _dbContext.ArshatidRegistrations
             .Where((ArshatidRegistration r) => r.Invitee.ArshatidFk == eventId)
             .ToList();
-        int inviteeCount = registrations.Count;
+        int inviteeCount = _dbContext.ArshatidInvitees
+            .Count((ArshatidInvitee i) => i.ArshatidFk == eventId);
+        int registeredCount = registrations.Count;
         int plusCount = registrations.Sum((ArshatidRegistration r) => r.Plus);
         Dictionary<DateTime, int> histogram = registrations
             .GroupBy((ArshatidRegistration r) => DateTime.Today)
@@ -39,8 +41,10 @@ public class RegistrationsController : Controller
                           (IGrouping<DateTime, ArshatidRegistration> g) => g.Count());
         ViewBag.Event = evnt;
         ViewBag.InviteeCount = inviteeCount;
+        ViewBag.RegisteredCount = registeredCount;
         ViewBag.PlusCount = plusCount;
         ViewBag.Histogram = histogram;
+        ViewBag.EventId = eventId;
         return View();
     }
 
